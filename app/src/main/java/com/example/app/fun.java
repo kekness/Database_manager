@@ -75,4 +75,23 @@ public class fun {
         }
     }
 
+    //save data from string to file
+    public static void saveToFile(String data) {
+        try {
+            File path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS);
+            File file = new File(path, "data.json");
+
+            if (!path.exists()) {
+                path.mkdirs();
+            }
+
+            BufferedWriter writer = new BufferedWriter(new FileWriter(file));
+            writer.write(data);
+            writer.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+
 }

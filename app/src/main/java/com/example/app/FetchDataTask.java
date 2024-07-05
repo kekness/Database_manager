@@ -53,7 +53,7 @@ public class FetchDataTask extends AsyncTask<String, Void, String> {
         Log.d("FetchDataTask", "Response from server: " + result);
         try {
             JSONArray jsonArray = new JSONArray(result);
-            saveToFile(result);
+            fun.saveToFile(result);
             if (listener != null) {
                 listener.onFetchDataSuccess(jsonArray);
             }
@@ -63,23 +63,6 @@ public class FetchDataTask extends AsyncTask<String, Void, String> {
     }
 
 
-    //save data from database to file
-    public void saveToFile(String data) {
-        try {
-            File path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS);
-            File file = new File(path, "data.json");
-
-            if (!path.exists()) {
-                path.mkdirs();
-            }
-
-            BufferedWriter writer = new BufferedWriter(new FileWriter(file));
-            writer.write(data);
-            writer.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
 
     public interface FetchDataListener {
         void onFetchDataSuccess(JSONArray jsonArray);
