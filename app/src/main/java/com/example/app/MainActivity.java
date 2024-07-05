@@ -26,6 +26,7 @@ public class MainActivity extends AppCompatActivity implements FetchDataTask.Fet
     private Button saveButton;
     private Button syncButton;
     private Button viewButton;
+    private Button filterButton;
 
     private RecyclerView recyclerView;
     private MyAdapter myAdapter;
@@ -34,7 +35,8 @@ public class MainActivity extends AppCompatActivity implements FetchDataTask.Fet
     public static EditText editTextCode;
     public static EditText editTextName;
     public static EditText editTextDate;
-
+    public EditText filterText;
+    public static boolean filter_visibility = true;
     @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,11 +46,13 @@ public class MainActivity extends AppCompatActivity implements FetchDataTask.Fet
         editTextCode = findViewById(R.id.editTextCode);
         editTextDate = findViewById(R.id.editTextDate);
         editTextName = findViewById(R.id.editTextTextName);
+        filterText = findViewById(R.id.editTextFilter);
 
         getButton = findViewById(R.id.myButton);
         saveButton = findViewById(R.id.myButton2);
         syncButton = findViewById(R.id.syncButton);
         viewButton = findViewById(R.id.viewButton);
+        filterButton = findViewById(R.id.filterButton);
 
         recyclerView = findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -74,7 +78,11 @@ public class MainActivity extends AppCompatActivity implements FetchDataTask.Fet
             @Override
             public void onClick(View v) {
 
-                JSONArray jsonArray=fun.fileToJsonArray(jsonFile);
+                JSONArray jsonArray;
+                if(filter_visibility)
+                jsonArray=fun.fileToJsonArray(jsonFile,Integer.parseInt(filterText.getText().toString())); //second argument is just number from filter textbox
+                else
+                    jsonArray=fun.fileToJsonArray(jsonFile);
                  myAdapter = new MyAdapter(MainActivity.this,jsonArray);
                  recyclerView.setAdapter(myAdapter);
             }
@@ -103,6 +111,21 @@ public class MainActivity extends AppCompatActivity implements FetchDataTask.Fet
                 Log.d("przycisk", "dzialam");
                 new SaveDataAsyncTask().execute(jsonFile);//UPLOAD DATA
                 new FetchDataTask(MainActivity.this).execute(url);//DOWNLOAD DATA
+            }
+        });
+        filterButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(filterText.isShown()) {
+                    filterButton.setText("filter: OFF");
+                    filterText.setVisibility(View.GONE);
+                    filter_visibility=false;
+                }
+                else {
+                    filterButton.setText("filter: ON");
+                    filterText.setVisibility(View.VISIBLE);
+                    filter_visibility=true;
+                }
             }
         });
     }

@@ -75,6 +75,40 @@ public class fun {
         }
     }
 
+    //convert file using filter
+    public static JSONArray fileToJsonArray(File jsonFile, int filter) {
+
+            StringBuilder jsonContent = new StringBuilder();
+            try (BufferedReader br = new BufferedReader(new FileReader(jsonFile))) {
+                String line;
+                while ((line = br.readLine()) != null) {
+                    jsonContent.append(line);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+                return null;
+            }
+
+            try {
+                JSONArray jsonArray = new JSONArray(jsonContent.toString());
+                JSONArray filteredArray = new JSONArray();
+
+                for (int i = 0; i < jsonArray.length(); i++) {
+                    JSONObject jsonObject = jsonArray.getJSONObject(i);
+                    if (jsonObject.getInt("status") == filter) {
+                        filteredArray.put(jsonObject);
+                    }
+                }
+
+                return filteredArray;
+            } catch (JSONException e) {
+                e.printStackTrace();
+                return null;
+            }
+
+    }
+
+
     //save data from string to file
     public static void saveToFile(String data) {
         try {

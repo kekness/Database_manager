@@ -80,12 +80,15 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
             });
         }
 
+
+        //edytowanie
         private void showEditDialog(JSONObject jsonObject, int position) {
             AlertDialog.Builder builder = new AlertDialog.Builder(context);
             builder.setTitle("Edit Record");
 
             View viewInflated = LayoutInflater.from(context).inflate(R.layout.edit_dialog, null, false);
 
+            final EditText inputStatus = viewInflated.findViewById(R.id.editTextStatus);
             final EditText inputCode = viewInflated.findViewById(R.id.editTextCode);
             final EditText inputName = viewInflated.findViewById(R.id.editTextName);
             final EditText inputDate = viewInflated.findViewById(R.id.editTextDate);
@@ -108,6 +111,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
                         jsonObject.put("kod", inputCode.getText().toString());
                         jsonObject.put("nazwa", inputName.getText().toString());
                         jsonObject.put("data", inputDate.getText().toString());
+                        jsonObject.put("status", inputStatus.getText().toString());
                         jsonArray.put(position, jsonObject);
                         notifyItemChanged(position);
 
