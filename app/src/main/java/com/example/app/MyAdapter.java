@@ -9,14 +9,17 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import java.io.File;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
 
@@ -35,14 +38,11 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
         return new MyViewHolder(view);
     }
 
-
     @Override
     public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
         try {
             JSONObject jsonObject = jsonArray.getJSONObject(position);
-            holder.textViewCode.setText(jsonObject.getString("kod"));
-            holder.textViewName.setText(jsonObject.getString("nazwa"));
-            holder.textViewDate.setText(jsonObject.getString("data"));
+            holder.bind(jsonObject);
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -54,14 +54,12 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
     }
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
-        TextView textViewCode, textViewName, textViewDate;
+        LinearLayout container;
         Button editButton;
 
         public MyViewHolder(@NonNull View itemView) {
             super(itemView);
-            textViewCode = itemView.findViewById(R.id.textViewCode);
-            textViewName = itemView.findViewById(R.id.textViewName);
-            textViewDate = itemView.findViewById(R.id.textViewDate);
+            container = itemView.findViewById(R.id.container);
             editButton = itemView.findViewById(R.id.editButton);
 
             editButton.setOnClickListener(new View.OnClickListener() {
@@ -80,38 +78,51 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
             });
         }
 
+        public void bind(JSONObject jsonObject) {
+            container.removeAllViews();
+            for (Iterator<String> it = jsonObject.keys(); it.hasNext(); ) {
+                String key = it.next();
+                String value = jsonObject.optString(key);
 
-        //edytowanie
+                TextView textView = new TextView(context);
+                textView.setText(key + ": " + value);
+                container.addView(textView);
+            }
+        }
+
         private void showEditDialog(JSONObject jsonObject, int position) {
             AlertDialog.Builder builder = new AlertDialog.Builder(context);
             builder.setTitle("Edit Record");
 
-            View viewInflated = LayoutInflater.from(context).inflate(R.layout.edit_dialog, null, false);
+            LinearLayout layout = new LinearLayout(context);
+            layout.setOrientation(LinearLayout.VERTICAL);
+            final HashMap<String, EditText> editTextMap = new HashMap<>();
 
-            final EditText inputStatus = viewInflated.findViewById(R.id.editTextStatus);
-            final EditText inputCode = viewInflated.findViewById(R.id.editTextCode);
-            final EditText inputName = viewInflated.findViewById(R.id.editTextName);
-            final EditText inputDate = viewInflated.findViewById(R.id.editTextDate);
+            for (Iterator<String> it = jsonObject.keys(); it.hasNext(); ) {
+                String key = it.next();
+                String value = jsonObject.optString(key);
 
-            try {
-                inputCode.setText(jsonObject.getString("kod"));
-                inputName.setText(jsonObject.getString("nazwa"));
-                inputDate.setText(jsonObject.getString("data"));
-            } catch (JSONException e) {
-                e.printStackTrace();
+                TextView textView = new TextView(context);
+                textView.setText(key);
+                layout.addView(textView);
+
+                EditText editText = new EditText(context);
+                editText.setText(value);
+                layout.addView(editText);
+
+                editTextMap.put(key, editText);
             }
 
-            builder.setView(viewInflated);
+            builder.setView(layout);
 
             builder.setPositiveButton("Save", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
                     dialog.dismiss();
                     try {
-                        jsonObject.put("kod", inputCode.getText().toString());
-                        jsonObject.put("nazwa", inputName.getText().toString());
-                        jsonObject.put("data", inputDate.getText().toString());
-                        jsonObject.put("status", inputStatus.getText().toString());
+                        for (Map.Entry<String, EditText> entry : editTextMap.entrySet()) {
+                            jsonObject.put(entry.getKey(), entry.getValue().getText().toString());
+                        }
                         jsonArray.put(position, jsonObject);
                         notifyItemChanged(position);
 
@@ -134,7 +145,5 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
 
             builder.show();
         }
-
     }
-
 }
