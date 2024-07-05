@@ -75,7 +75,7 @@ public class MainActivity extends AppCompatActivity implements FetchDataTask.Fet
             public void onClick(View v) {
 
                 JSONArray jsonArray=fun.fileToJsonArray(jsonFile);
-                 myAdapter = new MyAdapter(jsonArray);
+                 myAdapter = new MyAdapter(MainActivity.this,jsonArray);
                  recyclerView.setAdapter(myAdapter);
             }
         });
@@ -109,7 +109,7 @@ public class MainActivity extends AppCompatActivity implements FetchDataTask.Fet
 
     @Override
     public void onFetchDataSuccess(JSONArray jsonArray) {
-        myAdapter = new MyAdapter(jsonArray);
+        myAdapter = new MyAdapter(this,jsonArray);
         recyclerView.setAdapter(myAdapter);
     }
 }

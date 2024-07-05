@@ -93,5 +93,12 @@ public class fun {
         }
     }
 
+    public static void saveJsonArrayToFile(JSONArray jsonArray, File file) {
+        try (FileWriter fileWriter = new FileWriter(file)) {
+            fileWriter.write(jsonArray.toString());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
 }
