@@ -23,7 +23,6 @@
             android:layout_height="wrap_content"
             android:text="filter: ON" />
 
-
         <EditText
             android:id="@+id/editTextFilter"
             android:layout_width="wrap_content"
@@ -40,30 +39,6 @@
         android:layout_weight="1"
         android:layout_marginTop="16dp" />
 
-    <EditText
-        android:id="@+id/editTextCode"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:ems="10"
-        android:hint="Enter code"
-        android:inputType="text" />
-
-    <EditText
-        android:id="@+id/editTextTextName"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:ems="10"
-        android:hint="Enter name"
-        android:inputType="text" />
-
-    <EditText
-        android:id="@+id/editTextDate"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:ems="10"
-        android:hint="Select date"
-        android:inputType="date" />
-
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -74,7 +49,7 @@
             android:id="@+id/myButton2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/save" />
+            android:text="Add" />
 
         <Button
             android:id="@+id/syncButton"
@@ -88,5 +63,4 @@
             android:layout_height="wrap_content"
             android:text="@string/view" />
     </LinearLayout>
-
 </LinearLayout>
