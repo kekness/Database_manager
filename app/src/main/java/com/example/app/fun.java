@@ -61,6 +61,7 @@ public class fun {
             String line;
             while ((line = br.readLine()) != null) {
                 jsonContent.append(line);
+
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -135,4 +136,25 @@ public class fun {
         }
     }
 
+    public static JSONArray filterJsonArray(JSONArray jsonArray, String selectedColumn, String filterValue) {
+        JSONArray filteredArray = new JSONArray();
+
+        try {
+            for (int i = 0; i < jsonArray.length(); i++) {
+                JSONObject jsonObject = jsonArray.getJSONObject(i);
+
+                if (jsonObject.has(selectedColumn)) {
+                    String columnValue = jsonObject.getString(selectedColumn);
+
+                    if (columnValue != null && columnValue.contains(filterValue)) {
+                        filteredArray.put(jsonObject);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return filteredArray;
+    }
 }

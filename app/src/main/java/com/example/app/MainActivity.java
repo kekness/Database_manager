@@ -9,9 +9,12 @@ import android.os.Environment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.Spinner;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -24,6 +27,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -39,8 +43,11 @@ public class MainActivity extends AppCompatActivity implements FetchDataTask.Fet
     private MyAdapter myAdapter;
     private String url = config.API_GETDATA_URL;
     private EditText filterText;
+    private Spinner columnSpinner;
     private boolean filter_visibility = true;
     private HashMap<String, EditText> editTextMap = new HashMap<>();
+    private ArrayList<String> columnList = new ArrayList<>();
+    private ArrayAdapter<String> spinnerAdapter;
 
     @SuppressLint("MissingInflatedId")
     @Override
@@ -55,6 +62,8 @@ public class MainActivity extends AppCompatActivity implements FetchDataTask.Fet
         viewButton = findViewById(R.id.viewButton);
         filterButton = findViewById(R.id.filterButton);
         recyclerView = findViewById(R.id.recyclerView);
+        columnSpinner = findViewById(R.id.spinner);
+
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
         File jsonFile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS), "data.json");
@@ -74,11 +83,12 @@ public class MainActivity extends AppCompatActivity implements FetchDataTask.Fet
         viewButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                JSONArray jsonArray;
-                if (filter_visibility)
-                    jsonArray = fun.fileToJsonArray(jsonFile, Integer.parseInt(filterText.getText().toString())); //second argument is just number from filter textbox
-                else
-                    jsonArray = fun.fileToJsonArray(jsonFile);
+                JSONArray jsonArray = fun.fileToJsonArray(jsonFile);
+                if (filter_visibility) {
+                    String selectedColumn = columnSpinner.getSelectedItem().toString();
+                    String filterValue = filterText.getText().toString();
+                    jsonArray = fun.filterJsonArray(jsonArray, selectedColumn, filterValue);
+                }
                 myAdapter = new MyAdapter(MainActivity.this, jsonArray);
                 recyclerView.setAdapter(myAdapter);
             }
@@ -95,8 +105,8 @@ public class MainActivity extends AppCompatActivity implements FetchDataTask.Fet
             @Override
             public void onClick(View view) {
                 Log.d("przycisk", "dzialam");
-                new SaveDataAsyncTask().execute(jsonFile);//UPLOAD DATA
-                new FetchDataTask(MainActivity.this).execute(url);//DOWNLOAD DATA
+                new SaveDataAsyncTask().execute(jsonFile); //UPLOAD DATA
+                new FetchDataTask(MainActivity.this).execute(url); //DOWNLOAD DATA
             }
         });
 
@@ -106,14 +116,38 @@ public class MainActivity extends AppCompatActivity implements FetchDataTask.Fet
                 if (filterText.isShown()) {
                     filterButton.setText("filter: OFF");
                     filterText.setVisibility(View.GONE);
+                    columnSpinner.setVisibility(View.GONE);
                     filter_visibility = false;
                 } else {
                     filterButton.setText("filter: ON");
                     filterText.setVisibility(View.VISIBLE);
+                    columnSpinner.setVisibility(View.VISIBLE);
                     filter_visibility = true;
                 }
             }
         });
+
+        loadColumnNames(jsonFile);
+    }
+
+    private void loadColumnNames(File jsonFile) {
+        try {
+            JSONArray jsonArray = fun.fileToJsonArray(jsonFile);
+            if (jsonArray.length() > 0) {
+                JSONObject jsonObject = jsonArray.getJSONObject(0);
+                for (Iterator<String> it = jsonObject.keys(); it.hasNext(); ) {
+                    String key = it.next();
+                    if (!key.equals("id")) {
+                        columnList.add(key);
+                    }
+                }
+                spinnerAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, columnList);
+                spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                columnSpinner.setAdapter(spinnerAdapter);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private void showAddDialog(File jsonFile) {
@@ -182,7 +216,6 @@ public class MainActivity extends AppCompatActivity implements FetchDataTask.Fet
 
         builder.show();
     }
-
 
     @Override
     public void onFetchDataSuccess(JSONArray jsonArray) {
