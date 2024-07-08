@@ -86,7 +86,7 @@ public class RegisterActivity extends AppCompatActivity {
             String password = params[2];
 
             try {
-                URL url = new URL("http://192.168.210.116/register.php");
+                URL url = new URL(config.API_REGISTER_URL);
                 HttpURLConnection connection = (HttpURLConnection) url.openConnection();
                 connection.setRequestMethod("POST");
                 connection.setDoOutput(true);
