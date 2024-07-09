@@ -69,6 +69,11 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/view" />
+        <Button
+            android:id="@+id/settingsButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/settings" />
     </LinearLayout>
 
 </LinearLayout>

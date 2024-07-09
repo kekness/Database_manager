@@ -14,4 +14,6 @@
     <string name="view">view</string>
     <string name="save">save</string>
     <string name="code">Code</string>
+    <string name="adress">adress</string>
+    <string name="settings">settings</string>
 </resources>

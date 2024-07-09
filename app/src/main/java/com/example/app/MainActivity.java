@@ -39,6 +39,7 @@ public class MainActivity extends AppCompatActivity implements FetchDataTask.Fet
     private Button syncButton;
     private Button viewButton;
     private Button filterButton;
+    private Button settingsButton;
     private RecyclerView recyclerView;
     private MyAdapter myAdapter;
     private String url = config.API_GETDATA_URL;
@@ -55,6 +56,7 @@ public class MainActivity extends AppCompatActivity implements FetchDataTask.Fet
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        settingsButton=findViewById(R.id.settingsButton);
         filterText = findViewById(R.id.editTextFilter);
         getButton = findViewById(R.id.myButton);
         addButton = findViewById(R.id.myButton2);
@@ -126,6 +128,13 @@ public class MainActivity extends AppCompatActivity implements FetchDataTask.Fet
                 }
             }
         });
+        settingsButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                SettingsDialog settingsDialog = new SettingsDialog(MainActivity.this);
+                settingsDialog.showSettingsDialog();
+            }
+        });
 
         loadColumnNames(jsonFile);
     }
@@ -184,26 +193,23 @@ public class MainActivity extends AppCompatActivity implements FetchDataTask.Fet
 
         builder.setView(viewInflated);
 
-        builder.setPositiveButton("Add", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                try {
-                    JSONObject newJsonObject = new JSONObject();
-                    for (Map.Entry<String, EditText> entry : dialogEditTextMap.entrySet()) {
-                        newJsonObject.put(entry.getKey(), entry.getValue().getText().toString());
-                    }
-
-                    // Remove 'id' from the new record data
-                    newJsonObject.remove("id");
-
-                    JSONArray jsonArray = fun.fileToJsonArray(jsonFile);
-                    jsonArray.put(newJsonObject);
-                    fun.saveJsonArrayToFile(jsonArray, jsonFile);
-
-                    dialog.dismiss();
-                } catch (Exception e) {
-                    e.printStackTrace();
+        builder.setPositiveButton("Add", (dialog, which) -> {
+            try {
+                JSONObject newJsonObject = new JSONObject();
+                for (Map.Entry<String, EditText> entry : dialogEditTextMap.entrySet()) {
+                    newJsonObject.put(entry.getKey(), entry.getValue().getText().toString());
                 }
+
+                // Remove 'id' from the new record data
+                newJsonObject.remove("id");
+
+                JSONArray jsonArray = fun.fileToJsonArray(jsonFile);
+                jsonArray.put(newJsonObject);
+                fun.saveJsonArrayToFile(jsonArray, jsonFile);
+
+                dialog.dismiss();
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         });
 
