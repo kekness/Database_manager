@@ -10,20 +10,28 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
+public class SaveDataAsyncTask extends AsyncTask<Object, Void, String> {
 
-//THIS CLASS INSERTS THE JSON FILE TO THE DATABASE
-public class SaveDataAsyncTask extends AsyncTask<File, Void, String> {
+    private String datatable;
+    private String databasename;
+    private String servername;
+
+    public SaveDataAsyncTask() {
+        this.datatable = config.TABLENAME;
+        this.databasename = config.DATABASE;
+        this.servername = "192.168.210.116";
+    }
 
     @Override
-    protected String doInBackground(File... files) {
-        if (files.length == 0) {
+    protected String doInBackground(Object... objects) {
+        if (objects.length == 0) {
             return null;
         }
 
-        File jsonFile = files[0];
+        File jsonFile = (File) objects[0];
 
         try {
-            URL url = new URL(config.API_INSERTDATA_URL);
+            URL url = new URL(config.API_INSERTDATA_URL + "?tablename=" + datatable + "&dbname=" + databasename + "&servername=" + servername);
             HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
             urlConnection.setRequestMethod("POST");
             urlConnection.setDoOutput(true);
