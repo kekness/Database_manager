@@ -4,9 +4,11 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -14,6 +16,9 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
+import android.widget.TableLayout;
+import android.widget.TableRow;
+import android.widget.TextView;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -23,6 +28,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
@@ -45,6 +51,7 @@ public class MainActivity extends AppCompatActivity {
     private EditText filterText;
     private Spinner columnSpinner;
     private boolean filter_visibility = true;
+    private TableLayout tableLayout;
     private HashMap<String, EditText> editTextMap = new HashMap<>();
     private ArrayList<String> columnList = new ArrayList<>();
     private ArrayAdapter<String> spinnerAdapter;
@@ -67,10 +74,11 @@ public class MainActivity extends AppCompatActivity {
         syncButton = findViewById(R.id.syncButton);
         viewButton = findViewById(R.id.viewButton);
         filterButton = findViewById(R.id.filterButton);
-        recyclerView = findViewById(R.id.recyclerView);
+        //recyclerView = findViewById(R.id.recyclerView);
         columnSpinner = findViewById(R.id.spinner);
+        tableLayout=findViewById(R.id.tableLayout);
 
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        //recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
         File jsonFile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS), "data.json");
 
@@ -95,8 +103,7 @@ public class MainActivity extends AppCompatActivity {
                     String filterValue = filterText.getText().toString();
                     jsonArray = fun.filterJsonArray(jsonArray, selectedColumn, filterValue);
                 }
-                myAdapter = new MyAdapter(MainActivity.this, jsonArray);
-                recyclerView.setAdapter(myAdapter);
+                updateTableLayout(jsonArray);
             }
         });
 
@@ -144,10 +151,87 @@ public class MainActivity extends AppCompatActivity {
         loadColumnNames(jsonFile);
     }
 
-    public void updateRecyclerView(JSONArray jsonArray) {
-        myAdapter = new MyAdapter(this, jsonArray);
-        recyclerView.setAdapter(myAdapter);
+    public void updateTableLayout(JSONArray jsonArray) {
+        tableLayout.removeAllViews();
+
+        // Dodaj wiersz nagłówków kolumn
+        TableRow headerRow = new TableRow(this);
+        headerRow.setLayoutParams(new TableLayout.LayoutParams(
+                TableLayout.LayoutParams.MATCH_PARENT,
+                TableLayout.LayoutParams.WRAP_CONTENT));
+
+        // Pobierz nazwy kolumn z pierwszego obiektu JSON (założenie, że wszystkie obiekty mają te same klucze)
+        try {
+            if (jsonArray.length() > 0) {
+                JSONObject firstObject = jsonArray.getJSONObject(0);
+                Iterator<String> keys = firstObject.keys();
+                while (keys.hasNext()) {
+                    String key = keys.next();
+
+                    // Utwórz TextView dla nagłówka kolumny
+                    TextView headerTextView = new TextView(this);
+                    headerTextView.setText(key);
+                    headerTextView.setPadding(10, 10, 10, 10);
+                    headerTextView.setLayoutParams(new TableRow.LayoutParams(
+                            TableRow.LayoutParams.WRAP_CONTENT,
+                            TableRow.LayoutParams.WRAP_CONTENT));
+                    headerTextView.setBackgroundColor(Color.LTGRAY); // Tło nagłówka
+                    headerTextView.setTextColor(Color.BLACK); // Kolor tekstu nagłówka
+                    headerTextView.setGravity(Gravity.CENTER); // Wycentrowanie tekstu
+
+                    headerRow.addView(headerTextView);
+                }
+                // Dodaj wiersz nagłówków do tabeli
+                tableLayout.addView(headerRow);
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        // Dodaj rzeczywiste dane do tabeli
+        for (int i = 0; i < jsonArray.length(); i++) {
+            try {
+                JSONObject jsonObject = jsonArray.getJSONObject(i);
+                TableRow tableRow = new TableRow(this);
+                tableRow.setLayoutParams(new TableLayout.LayoutParams(
+                        TableLayout.LayoutParams.MATCH_PARENT,
+                        TableLayout.LayoutParams.WRAP_CONTENT));
+
+                // Dodaj onClickListener do wiersza
+                final int position = i;
+                tableRow.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        showEditDialog(jsonObject, position,jsonArray);
+                    }
+                });
+
+                Iterator<String> it = jsonObject.keys();
+                while (it.hasNext()) {
+                    String key = it.next();
+                    String value = jsonObject.optString(key);
+
+                    TextView textView = new TextView(this);
+                    textView.setText(value);
+                    textView.setPadding(10, 10, 10, 10);
+                    textView.setLayoutParams(new TableRow.LayoutParams(
+                            TableRow.LayoutParams.WRAP_CONTENT,
+                            TableRow.LayoutParams.WRAP_CONTENT));
+                    textView.setGravity(Gravity.CENTER); // Wycentrowanie tekstu
+
+                    tableRow.addView(textView);
+                }
+
+                // Dodaj wiersz danych do tabeli
+                tableLayout.addView(tableRow);
+
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
     }
+
+
 
     private void loadColumnNames(File jsonFile) {
         try {
@@ -232,4 +316,77 @@ public class MainActivity extends AppCompatActivity {
 
         builder.show();
     }
+    private void showEditDialog(JSONObject jsonObject, int position,JSONArray jsonArray) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Edit Record");
+
+        LinearLayout layout = new LinearLayout(this);
+        layout.setOrientation(LinearLayout.VERTICAL);
+        final HashMap<String, EditText> editTextMap = new HashMap<>();
+
+        try {
+            Iterator<String> keys = jsonObject.keys();
+            while (keys.hasNext()) {
+                String key = keys.next();
+                String value = jsonObject.getString(key);
+
+                TextView textView = new TextView(this);
+                textView.setText(key);
+                layout.addView(textView);
+
+                EditText editText = new EditText(this);
+                editText.setText(value);
+                layout.addView(editText);
+
+                editTextMap.put(key, editText);
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        builder.setView(layout);
+
+        builder.setPositiveButton("Save", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                try {
+                    // Aktualizacja danych w jsonObject na podstawie wprowadzonych wartości
+                    for (Map.Entry<String, EditText> entry : editTextMap.entrySet()) {
+                        String key = entry.getKey();
+                        String newValue = entry.getValue().getText().toString();
+                        jsonObject.put(key, newValue);
+                    }
+
+                    // Zaktualizowanie jsonArray pod odpowiednim indeksem
+                    jsonArray.put(position, jsonObject);
+
+                    // Odświeżenie tabeli po edycji
+                    updateTableLayout(jsonArray);
+
+                    // Zapisanie zmian do pliku JSON
+                    File jsonFile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS), "data.json");
+                    fun.saveJsonArrayToFile(jsonArray, jsonFile);
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                dialog.dismiss();
+            }
+        });
+
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+
+        builder.show();
+    }
+
+
 }
+
+
+
+

@@ -79,7 +79,7 @@ public class FetchDataTask extends AsyncTask<String, Void, String> {
         try {
             JSONArray jsonArray = new JSONArray(result);
             fun.saveToFile(result);
-            mainActivity.updateRecyclerView(jsonArray);
+            mainActivity.updateTableLayout(jsonArray);
         } catch (JSONException e) {
             e.printStackTrace();
         }
