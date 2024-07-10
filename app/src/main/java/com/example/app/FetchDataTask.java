@@ -6,23 +6,34 @@ import android.util.Log;
 
 import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLEncoder;
 
 public class FetchDataTask extends AsyncTask<String, Void, String> {
 
-    private FetchDataListener listener;
+    private String servername;
+    private String username;
+    private String password;
+    private String dbname;
+    private String tablename;
+    private MainActivity mainActivity;
 
-    public FetchDataTask(FetchDataListener listener) {
-        this.listener = listener;
+    public FetchDataTask(MainActivity mainActivity, String servername, String username, String password, String dbname, String tablename) {
+        this.mainActivity = mainActivity;
+        this.servername = servername;
+        this.username = username;
+        this.password = password;
+        this.dbname = dbname;
+        this.tablename = tablename;
     }
 
     @Override
@@ -32,15 +43,29 @@ public class FetchDataTask extends AsyncTask<String, Void, String> {
         try {
             URL url = new URL(urlString);
             HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
-            try {
-                BufferedReader in = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
-                String line;
-                while ((line = in.readLine()) != null) {
-                    result.append(line);
-                }
-            } finally {
-                urlConnection.disconnect();
+            urlConnection.setRequestMethod("POST");
+            urlConnection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+            urlConnection.setDoOutput(true);
+
+            String postData = "servername=" + URLEncoder.encode(servername, "UTF-8") +
+                    "&username=" + URLEncoder.encode(username, "UTF-8") +
+                    "&password=" + URLEncoder.encode(password, "UTF-8") +
+                    "&dbname=" + URLEncoder.encode(dbname, "UTF-8") +
+                    "&tablename=" + URLEncoder.encode(tablename, "UTF-8");
+
+            OutputStream os = urlConnection.getOutputStream();
+            BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"));
+            writer.write(postData);
+            writer.flush();
+            writer.close();
+            os.close();
+
+            BufferedReader in = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
+            String line;
+            while ((line = in.readLine()) != null) {
+                result.append(line);
             }
+            in.close();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -54,17 +79,11 @@ public class FetchDataTask extends AsyncTask<String, Void, String> {
         try {
             JSONArray jsonArray = new JSONArray(result);
             fun.saveToFile(result);
-            if (listener != null) {
-                listener.onFetchDataSuccess(jsonArray);
-            }
+            mainActivity.updateRecyclerView(jsonArray);
         } catch (JSONException e) {
             e.printStackTrace();
         }
     }
 
 
-
-    public interface FetchDataListener {
-        void onFetchDataSuccess(JSONArray jsonArray);
-    }
 }

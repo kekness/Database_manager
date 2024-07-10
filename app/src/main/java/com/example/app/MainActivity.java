@@ -9,7 +9,6 @@ import android.os.Environment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -32,7 +31,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-public class MainActivity extends AppCompatActivity implements FetchDataTask.FetchDataListener {
+public class MainActivity extends AppCompatActivity {
 
     private Button getButton;
     private Button addButton;
@@ -50,13 +49,18 @@ public class MainActivity extends AppCompatActivity implements FetchDataTask.Fet
     private ArrayList<String> columnList = new ArrayList<>();
     private ArrayAdapter<String> spinnerAdapter;
 
+    private String servername = "192.168.210.116";
+    private String username = "API";
+    private String password = ")Xcm*.H2OHn*THJl";
+
+
     @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        settingsButton=findViewById(R.id.settingsButton);
+        settingsButton = findViewById(R.id.settingsButton);
         filterText = findViewById(R.id.editTextFilter);
         getButton = findViewById(R.id.myButton);
         addButton = findViewById(R.id.myButton2);
@@ -78,7 +82,7 @@ public class MainActivity extends AppCompatActivity implements FetchDataTask.Fet
         getButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                new FetchDataTask(MainActivity.this).execute(url);
+                new FetchDataTask(MainActivity.this, servername, username, password, config.DATABASE, config.TABLENAME).execute(url);
             }
         });
 
@@ -108,7 +112,7 @@ public class MainActivity extends AppCompatActivity implements FetchDataTask.Fet
             public void onClick(View view) {
                 Log.d("przycisk", "dzialam");
                 new SaveDataAsyncTask().execute(jsonFile); //UPLOAD DATA
-                new FetchDataTask(MainActivity.this).execute(url); //DOWNLOAD DATA
+                new FetchDataTask(MainActivity.this, servername, username, password, config.DATABASE, config.TABLENAME).execute(url); //DOWNLOAD DATA
             }
         });
 
@@ -128,6 +132,7 @@ public class MainActivity extends AppCompatActivity implements FetchDataTask.Fet
                 }
             }
         });
+
         settingsButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -137,6 +142,11 @@ public class MainActivity extends AppCompatActivity implements FetchDataTask.Fet
         });
 
         loadColumnNames(jsonFile);
+    }
+
+    public void updateRecyclerView(JSONArray jsonArray) {
+        myAdapter = new MyAdapter(this, jsonArray);
+        recyclerView.setAdapter(myAdapter);
     }
 
     private void loadColumnNames(File jsonFile) {
@@ -221,11 +231,5 @@ public class MainActivity extends AppCompatActivity implements FetchDataTask.Fet
         });
 
         builder.show();
-    }
-
-    @Override
-    public void onFetchDataSuccess(JSONArray jsonArray) {
-        myAdapter = new MyAdapter(this, jsonArray);
-        recyclerView.setAdapter(myAdapter);
     }
 }

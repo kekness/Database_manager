@@ -23,11 +23,4 @@
         android:layout_height="wrap_content"
         android:hint="tablename" />
 
-    <Button
-        android:id="@+id/saveSettingsButton"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="save"
-        android:padding="12dp"
-        android:layout_marginTop="32dp"/>
 </LinearLayout>
