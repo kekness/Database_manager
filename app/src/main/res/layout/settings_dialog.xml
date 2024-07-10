@@ -22,5 +22,15 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="tablename" />
+    <EditText
+        android:id="@+id/editSettingsUser"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="dbuser" />
+    <EditText
+        android:id="@+id/editSettingsPassword"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="password" />
 
 </LinearLayout>

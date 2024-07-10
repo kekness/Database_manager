@@ -53,10 +53,10 @@ public class FetchDataTask extends AsyncTask<String, Void, String> {
 
             // Creating POST data
             String postData = "servername=" + URLEncoder.encode(servername, "UTF-8") +
-                    "&username=" + URLEncoder.encode(username, "UTF-8") +
-                    "&password=" + URLEncoder.encode(password, "UTF-8") +
-                    "&dbname=" + URLEncoder.encode(dbname, "UTF-8") +
-                    "&tablename=" + URLEncoder.encode(tablename, "UTF-8");
+                    "&username=" + URLEncoder.encode(config.DBUSER, "UTF-8") +
+                    "&password=" + URLEncoder.encode(config.DB_PASS, "UTF-8") +
+                    "&dbname=" + URLEncoder.encode(config.DATABASE, "UTF-8") +
+                    "&tablename=" + URLEncoder.encode(config.TABLENAME, "UTF-8");
 
             // Writing POST data to output stream
             OutputStream os = urlConnection.getOutputStream();

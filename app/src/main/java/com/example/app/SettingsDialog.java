@@ -23,6 +23,8 @@ public class SettingsDialog {
 
         View viewInflated = LayoutInflater.from(context).inflate(R.layout.settings_dialog, null, false);
 
+        EditText editSettingsUser = viewInflated.findViewById(R.id.editSettingsUser);
+        EditText editSettingsPassword = viewInflated.findViewById(R.id.editSettingsPassword);
         EditText editSettingsIP = viewInflated.findViewById(R.id.editSettingsIP);
         EditText editSettingsDatabase = viewInflated.findViewById(R.id.editSettingsDatabase);
         EditText editSettingsTablename = viewInflated.findViewById(R.id.editSettingsTablename);
@@ -35,6 +37,8 @@ public class SettingsDialog {
             config.ADDRESS = editSettingsIP.getText().toString();
             config.DATABASE = editSettingsDatabase.getText().toString();
             config.TABLENAME = editSettingsTablename.getText().toString();
+            config.DBUSER= editSettingsUser.getText().toString();
+            config.DB_PASS=editSettingsPassword.getText().toString();
 
         });
 
@@ -43,6 +47,8 @@ public class SettingsDialog {
         editSettingsIP.setText(config.ADDRESS);
         editSettingsDatabase.setText(config.DATABASE);
         editSettingsTablename.setText(config.TABLENAME);
+        editSettingsUser.setText(config.DBUSER);
+        editSettingsPassword.setText(config.DB_PASS);
 
         dialog.show();
     }
