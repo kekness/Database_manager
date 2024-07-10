@@ -45,8 +45,6 @@ public class MainActivity extends AppCompatActivity {
     private Button viewButton;
     private Button filterButton;
     private Button settingsButton;
-    private RecyclerView recyclerView;
-    private MyAdapter myAdapter;
     private String url = config.API_GETDATA_URL;
     private EditText filterText;
     private Spinner columnSpinner;
@@ -74,12 +72,10 @@ public class MainActivity extends AppCompatActivity {
         syncButton = findViewById(R.id.syncButton);
         viewButton = findViewById(R.id.viewButton);
         filterButton = findViewById(R.id.filterButton);
-        //recyclerView = findViewById(R.id.recyclerView);
         columnSpinner = findViewById(R.id.spinner);
         tableLayout=findViewById(R.id.tableLayout);
 
-        //recyclerView.setLayoutManager(new LinearLayoutManager(this));
-
+        //get actual data from saved file
         File jsonFile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS), "data.json");
 
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
@@ -87,6 +83,7 @@ public class MainActivity extends AppCompatActivity {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
         }
 
+        //button functions
         getButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -147,20 +144,19 @@ public class MainActivity extends AppCompatActivity {
                 settingsDialog.showSettingsDialog();
             }
         });
-
         loadColumnNames(jsonFile);
     }
 
     public void updateTableLayout(JSONArray jsonArray) {
         tableLayout.removeAllViews();
 
-        // Dodaj wiersz nagłówków kolumn
+        //add headers to table
         TableRow headerRow = new TableRow(this);
         headerRow.setLayoutParams(new TableLayout.LayoutParams(
                 TableLayout.LayoutParams.MATCH_PARENT,
                 TableLayout.LayoutParams.WRAP_CONTENT));
 
-        // Pobierz nazwy kolumn z pierwszego obiektu JSON (założenie, że wszystkie obiekty mają te same klucze)
+        //get headers
         try {
             if (jsonArray.length() > 0) {
                 JSONObject firstObject = jsonArray.getJSONObject(0);
@@ -168,27 +164,25 @@ public class MainActivity extends AppCompatActivity {
                 while (keys.hasNext()) {
                     String key = keys.next();
 
-                    // Utwórz TextView dla nagłówka kolumny
                     TextView headerTextView = new TextView(this);
                     headerTextView.setText(key);
                     headerTextView.setPadding(10, 10, 10, 10);
                     headerTextView.setLayoutParams(new TableRow.LayoutParams(
                             TableRow.LayoutParams.WRAP_CONTENT,
                             TableRow.LayoutParams.WRAP_CONTENT));
-                    headerTextView.setBackgroundColor(Color.LTGRAY); // Tło nagłówka
-                    headerTextView.setTextColor(Color.BLACK); // Kolor tekstu nagłówka
-                    headerTextView.setGravity(Gravity.CENTER); // Wycentrowanie tekstu
+                    headerTextView.setBackgroundColor(Color.LTGRAY);
+                    headerTextView.setTextColor(Color.BLACK);
+                    headerTextView.setGravity(Gravity.CENTER);
 
                     headerRow.addView(headerTextView);
                 }
-                // Dodaj wiersz nagłówków do tabeli
                 tableLayout.addView(headerRow);
             }
         } catch (JSONException e) {
             e.printStackTrace();
         }
 
-        // Dodaj rzeczywiste dane do tabeli
+        // add actuall data
         for (int i = 0; i < jsonArray.length(); i++) {
             try {
                 JSONObject jsonObject = jsonArray.getJSONObject(i);
@@ -197,7 +191,7 @@ public class MainActivity extends AppCompatActivity {
                         TableLayout.LayoutParams.MATCH_PARENT,
                         TableLayout.LayoutParams.WRAP_CONTENT));
 
-                // Dodaj onClickListener do wiersza
+                // make rows clickable
                 final int position = i;
                 tableRow.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -222,7 +216,6 @@ public class MainActivity extends AppCompatActivity {
                     tableRow.addView(textView);
                 }
 
-                // Dodaj wiersz danych do tabeli
                 tableLayout.addView(tableRow);
 
             } catch (JSONException e) {
@@ -230,7 +223,6 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
-
 
 
     private void loadColumnNames(File jsonFile) {

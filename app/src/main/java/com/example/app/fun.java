@@ -1,6 +1,7 @@
 package com.example.app;
 
 import android.os.Environment;
+import android.widget.ArrayAdapter;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -12,6 +13,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Iterator;
 
 public class fun {
     //save data from editboxes to file
@@ -157,4 +159,5 @@ public class fun {
 
         return filteredArray;
     }
+
 }
