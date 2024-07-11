@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -32,7 +33,6 @@ import java.util.ArrayList;
 
 public class MenuActivity extends AppCompatActivity {
 
-    Button goto_Button;
     Button createTable_Button;
     Button settings_Button;
     ListView tablesListView;
@@ -45,7 +45,6 @@ public class MenuActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_menu);
 
-        goto_Button = findViewById(R.id.gotobutton);
         createTable_Button = findViewById(R.id.createTableButton);
         settings_Button=findViewById(R.id.settingsButton);
         tablesListView = findViewById(R.id.tablesListView);
@@ -54,19 +53,13 @@ public class MenuActivity extends AppCompatActivity {
         tablesAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, tablesList);
         tablesListView.setAdapter(tablesAdapter);
 
-        goto_Button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(MenuActivity.this, MainActivity.class));
-            }
-        });
-
         createTable_Button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 showCreateTableDialog();
             }
         });
+
         settings_Button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -75,6 +68,16 @@ public class MenuActivity extends AppCompatActivity {
             }
         });
 
+        tablesListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                String clickedTable = tablesList.get(position);
+                config.TABLENAME=clickedTable;
+                startActivity(new Intent(MenuActivity.this, MainActivity.class));
+            }
+        });
+
+        //get tables from database to listview
         new FetchTablesTask().execute();
     }
 

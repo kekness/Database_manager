@@ -20,22 +20,11 @@ import java.net.URLEncoder;
 
 // AsyncTask to fetch data from a server and update UI
 public class FetchDataTask extends AsyncTask<String, Void, String> {
-
-    private String servername;
-    private String username;
-    private String password;
-    private String dbname;
-    private String tablename;
     private MainActivity mainActivity;
 
     // Constructor to initialize with required parameters
-    public FetchDataTask(MainActivity mainActivity, String servername, String username, String password, String dbname, String tablename) {
+    public FetchDataTask(MainActivity mainActivity) {
         this.mainActivity = mainActivity;
-        this.servername = servername;
-        this.username = username;
-        this.password = password;
-        this.dbname = dbname;
-        this.tablename = tablename;
     }
 
     // Background task to execute HTTP POST request
@@ -52,7 +41,7 @@ public class FetchDataTask extends AsyncTask<String, Void, String> {
             urlConnection.setDoOutput(true);
 
             // Creating POST data
-            String postData = "servername=" + URLEncoder.encode(servername, "UTF-8") +
+            String postData = "servername=" + URLEncoder.encode(config.ADDRESS, "UTF-8") +
                     "&username=" + URLEncoder.encode(config.DBUSER, "UTF-8") +
                     "&password=" + URLEncoder.encode(config.DB_PASS, "UTF-8") +
                     "&dbname=" + URLEncoder.encode(config.DATABASE, "UTF-8") +
@@ -93,6 +82,9 @@ public class FetchDataTask extends AsyncTask<String, Void, String> {
 
             // Update UI (MainActivity) with the JSON array data
             mainActivity.updateTableLayout(jsonArray);
+
+            //load columnes to filter spinner
+            mainActivity.loadColumnNames(MainActivity.jsonFile);
         } catch (JSONException e) {
             e.printStackTrace();
         }

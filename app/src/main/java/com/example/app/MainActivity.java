@@ -50,6 +50,7 @@ public class MainActivity extends AppCompatActivity {
     private TableLayout tableLayout;
     private ArrayList<String> columnList = new ArrayList<>();
     private ArrayAdapter<String> spinnerAdapter;
+    public static File jsonFile;
 
     @SuppressLint("MissingInflatedId")
     @Override
@@ -68,7 +69,7 @@ public class MainActivity extends AppCompatActivity {
         tableLayout=findViewById(R.id.tableLayout);
 
         //get actual data from saved file
-        File jsonFile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS), "data.json");
+        jsonFile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS), "data.json");
 
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
                 != PackageManager.PERMISSION_GRANTED) {
@@ -79,7 +80,7 @@ public class MainActivity extends AppCompatActivity {
         getButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                new FetchDataTask(MainActivity.this, config.ADDRESS, config.DBUSER, config.DB_PASS, config.DATABASE, config.TABLENAME).execute(url);
+                new FetchDataTask(MainActivity.this).execute(url);
             }
         });
 
@@ -108,7 +109,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 Log.d("przycisk", "dzialam");
                 new SaveDataAsyncTask().execute(jsonFile); //UPLOAD DATA
-                new FetchDataTask(MainActivity.this, config.ADDRESS, config.DBUSER, config.DB_PASS, config.DATABASE, config.TABLENAME).execute(url); //DOWNLOAD DATA
+                new FetchDataTask(MainActivity.this).execute(url); //DOWNLOAD DATA
             }
         });
 
@@ -135,7 +136,7 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(new Intent(MainActivity.this, MenuActivity.class));
             }
         });
-        loadColumnNames(jsonFile);
+        new FetchDataTask(MainActivity.this).execute(url);
     }
 
     public void updateTableLayout(JSONArray jsonArray) {
@@ -215,8 +216,8 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    //loads column names to filter
-    private void loadColumnNames(File jsonFile) {
+    //loads column names to filter spinner
+    public void loadColumnNames(File jsonFile) {
         try {
             JSONArray jsonArray = fun.fileToJsonArray(jsonFile);
             if (jsonArray.length() > 0) {
