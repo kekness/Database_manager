@@ -9,14 +9,20 @@
     <string name="Code">Code</string>
     <string name="Name">Name</string>
     <string name="Date" />
-    <string name="sync">sync\n</string>
     <string name="syn">sync</string>
     <string name="view">view</string>
     <string name="save">save</string>
     <string name="code">Code</string>
     <string name="adress">adress</string>
-    <string name="settings">settings</string>
-    <string name="create_table">create table</string>
-    <string name="go_to">go to</string>
     <string name="menu">menu</string>
+    <string name="create_table">Create Table</string>
+    <string name="settings">settings</string>
+    <string name="logout">logout</string>
+    <string-array name="column_types">
+        <item>INT</item>
+        <item>VARCHAR(255)</item>
+        <item>TEXT</item>
+        <item>DATE</item>
+        <item>FLOAT</item>
+    </string-array>
 </resources>

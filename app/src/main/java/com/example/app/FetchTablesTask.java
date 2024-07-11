@@ -27,7 +27,7 @@ public class FetchTablesTask extends AsyncTask<Void, Void, String> {
     protected String doInBackground(Void... params) {
         String result = "";
         try {
-            URL url = new URL("http://192.168.210.116/getTables.php");
+            URL url = new URL(config.API_GETTABLES_URL);
             HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
             urlConnection.setRequestMethod("POST");
             urlConnection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
