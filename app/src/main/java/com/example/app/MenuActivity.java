@@ -2,6 +2,7 @@ package com.example.app;
 
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
@@ -33,17 +34,19 @@ import java.util.ArrayList;
 
 public class MenuActivity extends AppCompatActivity {
 
+    public static Context context;
     Button createTable_Button;
     Button settings_Button;
     ListView tablesListView;
-    ArrayAdapter<String> tablesAdapter;
-    ArrayList<String> tablesList;
+    static ArrayAdapter<String> tablesAdapter;
+    static ArrayList<String> tablesList;
 
     @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_menu);
+        context=this;
 
         createTable_Button = findViewById(R.id.createTableButton);
         settings_Button=findViewById(R.id.settingsButton);
@@ -176,62 +179,5 @@ public class MenuActivity extends AppCompatActivity {
         }
     }
 
-    private class FetchTablesTask extends AsyncTask<Void, Void, String> {
 
-        @Override
-        protected String doInBackground(Void... params) {
-            String result = "";
-            try {
-                URL url = new URL("http://192.168.210.116/getTables.php");
-                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
-                urlConnection.setRequestMethod("POST");
-                urlConnection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
-                urlConnection.setDoOutput(true);
-
-                String postData = "servername=" + URLEncoder.encode(config.ADDRESS, "UTF-8") +
-                        "&username=" + URLEncoder.encode(config.DBUSER, "UTF-8") +
-                        "&password=" + URLEncoder.encode(config.DB_PASS, "UTF-8") +
-                        "&dbname=" + URLEncoder.encode(config.DATABASE, "UTF-8");
-
-                OutputStream os = urlConnection.getOutputStream();
-                BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"));
-                writer.write(postData);
-                writer.flush();
-                writer.close();
-                os.close();
-
-                BufferedReader in = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
-                String line;
-                StringBuilder response = new StringBuilder();
-                while ((line = in.readLine()) != null) {
-                    response.append(line);
-                }
-                in.close();
-
-                result = response.toString();
-
-            } catch (Exception e) {
-                e.printStackTrace();
-                result = e.getMessage();
-            }
-            return result;
-        }
-
-        @Override
-        protected void onPostExecute(String result) {
-            super.onPostExecute(result);
-            Log.d("FetchTablesTask", "Response from server: " + result);
-            try {
-                JSONArray jsonArray = new JSONArray(result);
-                tablesList.clear();
-                for (int i = 0; i < jsonArray.length(); i++) {
-                    tablesList.add(jsonArray.getString(i));
-                }
-                tablesAdapter.notifyDataSetChanged();
-            } catch (Exception e) {
-                e.printStackTrace();
-                Toast.makeText(MenuActivity.this, "Error parsing server response", Toast.LENGTH_SHORT).show();
-            }
-        }
-    }
 }
