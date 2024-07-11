@@ -7,6 +7,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
@@ -19,7 +20,7 @@ public class SaveDataAsyncTask extends AsyncTask<Object, Void, String> {
     public SaveDataAsyncTask() {
         this.datatable = config.TABLENAME;
         this.databasename = config.DATABASE;
-        this.servername = "192.168.210.116";
+        this.servername = config.ADDRESS;
     }
 
     @Override
@@ -31,16 +32,28 @@ public class SaveDataAsyncTask extends AsyncTask<Object, Void, String> {
         File jsonFile = (File) objects[0];
 
         try {
-            URL url = new URL(config.API_INSERTDATA_URL + "?tablename=" + datatable + "&dbname=" + databasename + "&servername=" + servername);
+            URL url = new URL(config.API_INSERTDATA_URL);
             HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
             urlConnection.setRequestMethod("POST");
             urlConnection.setDoOutput(true);
+            urlConnection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
 
-            // Read json.data from the file
-            String json = readFile(jsonFile);
+            // Prepare the JSON data and additional parameters
+            String json = fun.readFile(jsonFile);
+            String postData = "servername=" + servername +
+                    "&username=" + config.DBUSER +
+                    "&password=" + config.DB_PASS +
+                    "&dbname=" + databasename +
+                    "&tablename=" + datatable +
+                    "&json=" + json;
 
-            urlConnection.getOutputStream().write(json.getBytes());
+            // Send the POST data
+            OutputStreamWriter writer = new OutputStreamWriter(urlConnection.getOutputStream());
+            writer.write(postData);
+            writer.flush();
+            writer.close();
 
+            // Read the server response
             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
             StringBuilder stringBuilder = new StringBuilder();
             String line;
@@ -67,16 +80,5 @@ public class SaveDataAsyncTask extends AsyncTask<Object, Void, String> {
         }
     }
 
-    private String readFile(File file) {
-        StringBuilder stringBuilder = new StringBuilder();
-        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                stringBuilder.append(line).append("\n");
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return stringBuilder.toString();
-    }
+
 }

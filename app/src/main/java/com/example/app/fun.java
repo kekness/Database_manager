@@ -111,8 +111,7 @@ public class fun {
 
     }
 
-
-    //save data from string to file
+    //save data from string to data.json
     public static void saveToFile(String data) {
         try {
             File path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS);
@@ -130,6 +129,7 @@ public class fun {
         }
     }
 
+    //convert json array to already existing text file
     public static void saveJsonArrayToFile(JSONArray jsonArray, File file) {
         try (FileWriter fileWriter = new FileWriter(file)) {
             fileWriter.write(jsonArray.toString());
@@ -138,6 +138,7 @@ public class fun {
         }
     }
 
+    //returns array filtered by column selected in spinner
     public static JSONArray filterJsonArray(JSONArray jsonArray, String selectedColumn, String filterValue) {
         JSONArray filteredArray = new JSONArray();
 
@@ -160,4 +161,17 @@ public class fun {
         return filteredArray;
     }
 
+    //converts json file to a String
+    public static String readFile(File file) {
+        StringBuilder stringBuilder = new StringBuilder();
+        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                stringBuilder.append(line).append("\n");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return stringBuilder.toString();
+    }
 }
