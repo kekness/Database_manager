@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <EditText
+        android:id="@+id/table_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Table Name" />
+
+    <EditText
+        android:id="@+id/columns"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Columns (name type, ...)" />
+
+    <Button
+        android:id="@+id/add_table_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Add Table" />
+</LinearLayout>

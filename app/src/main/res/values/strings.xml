@@ -16,4 +16,6 @@
     <string name="code">Code</string>
     <string name="adress">adress</string>
     <string name="settings">settings</string>
+    <string name="create_table">create table</string>
+    <string name="go_to">go to</string>
 </resources>

@@ -24,9 +24,6 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -50,14 +47,8 @@ public class MainActivity extends AppCompatActivity {
     private Spinner columnSpinner;
     private boolean filter_visibility = true;
     private TableLayout tableLayout;
-    private HashMap<String, EditText> editTextMap = new HashMap<>();
     private ArrayList<String> columnList = new ArrayList<>();
     private ArrayAdapter<String> spinnerAdapter;
-
-    private String servername = "192.168.210.116";
-    private String username = "API";
-    private String password = ")Xcm*.H2OHn*THJl";
-
 
     @SuppressLint("MissingInflatedId")
     @Override
@@ -87,7 +78,7 @@ public class MainActivity extends AppCompatActivity {
         getButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                new FetchDataTask(MainActivity.this, servername, username, password, config.DATABASE, config.TABLENAME).execute(url);
+                new FetchDataTask(MainActivity.this, config.ADDRESS, config.DBUSER, config.DB_PASS, config.DATABASE, config.TABLENAME).execute(url);
             }
         });
 
@@ -116,7 +107,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 Log.d("przycisk", "dzialam");
                 new SaveDataAsyncTask().execute(jsonFile); //UPLOAD DATA
-                new FetchDataTask(MainActivity.this, servername, username, password, config.DATABASE, config.TABLENAME).execute(url); //DOWNLOAD DATA
+                new FetchDataTask(MainActivity.this, config.ADDRESS, config.DBUSER, config.DB_PASS, config.DATABASE, config.TABLENAME).execute(url); //DOWNLOAD DATA
             }
         });
 
