@@ -87,10 +87,10 @@
             android:layout_marginStart="8dp" />
 
         <Button
-            android:id="@+id/settingsButton"
+            android:id="@+id/menuButton"
             android:layout_width="100dp"
             android:layout_height="wrap_content"
-            android:text="@string/settings"
+            android:text="@string/menu"
             android:layout_marginStart="8dp" />
     </LinearLayout>
 

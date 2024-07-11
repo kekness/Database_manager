@@ -3,6 +3,7 @@ package com.example.app;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -41,7 +42,7 @@ public class MainActivity extends AppCompatActivity {
     private Button syncButton;
     private Button viewButton;
     private Button filterButton;
-    private Button settingsButton;
+    private Button menuButton;
     private String url = config.API_GETDATA_URL;
     private EditText filterText;
     private Spinner columnSpinner;
@@ -56,7 +57,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        settingsButton = findViewById(R.id.settingsButton);
+        menuButton = findViewById(R.id.menuButton);
         filterText = findViewById(R.id.editTextFilter);
         getButton = findViewById(R.id.myButton);
         addButton = findViewById(R.id.myButton2);
@@ -128,11 +129,10 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        settingsButton.setOnClickListener(new View.OnClickListener() {
+        menuButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                SettingsDialog settingsDialog = new SettingsDialog(MainActivity.this);
-                settingsDialog.showSettingsDialog();
+                startActivity(new Intent(MainActivity.this, MenuActivity.class));
             }
         });
         loadColumnNames(jsonFile);
@@ -215,7 +215,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-
+    //loads column names to filter
     private void loadColumnNames(File jsonFile) {
         try {
             JSONArray jsonArray = fun.fileToJsonArray(jsonFile);

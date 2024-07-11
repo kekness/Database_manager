@@ -18,4 +18,5 @@
     <string name="settings">settings</string>
     <string name="create_table">create table</string>
     <string name="go_to">go to</string>
+    <string name="menu">menu</string>
 </resources>

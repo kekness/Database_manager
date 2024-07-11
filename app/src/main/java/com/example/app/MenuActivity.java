@@ -1,5 +1,6 @@
 package com.example.app;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -33,10 +34,12 @@ public class MenuActivity extends AppCompatActivity {
 
     Button goto_Button;
     Button createTable_Button;
+    Button settings_Button;
     ListView tablesListView;
     ArrayAdapter<String> tablesAdapter;
     ArrayList<String> tablesList;
 
+    @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -44,6 +47,7 @@ public class MenuActivity extends AppCompatActivity {
 
         goto_Button = findViewById(R.id.gotobutton);
         createTable_Button = findViewById(R.id.createTableButton);
+        settings_Button=findViewById(R.id.settingsButton);
         tablesListView = findViewById(R.id.tablesListView);
 
         tablesList = new ArrayList<>();
@@ -61,6 +65,13 @@ public class MenuActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 showCreateTableDialog();
+            }
+        });
+        settings_Button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                SettingsDialog settingsDialog = new SettingsDialog(MenuActivity.this);
+                settingsDialog.showSettingsDialog();
             }
         });
 
