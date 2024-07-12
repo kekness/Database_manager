@@ -1,16 +1,27 @@
 package com.example.app;
 
+import static androidx.core.content.ContextCompat.startActivity;
+
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
+import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.TableRow;
 import android.widget.TextView;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
+import java.util.Iterator;
 
 public class TablesAdapter extends ArrayAdapter<String> {
 
@@ -32,7 +43,7 @@ public class TablesAdapter extends ArrayAdapter<String> {
         String tableName = getItem(position);
 
         TextView tableNameTextView = convertView.findViewById(R.id.tableNameTextView);
-        Button columnsButton = convertView.findViewById(R.id.columnsButton);
+        TextView columnsButton = convertView.findViewById(R.id.columnsTextView);
         LinearLayout itemLayout = convertView.findViewById(R.id.itemLayout);
 
         tableNameTextView.setText(tableName);
@@ -40,10 +51,9 @@ public class TablesAdapter extends ArrayAdapter<String> {
         columnsButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // Handle columns button click
-               // Intent intent = new Intent(context, ManageColumnsActivity.class);
-                //intent.putExtra("tableName", tableName);
-                //context.startActivity(intent);
+                Intent intent = new Intent(context, ManageColumnsActivity.class);
+               // intent.putExtra("tableName", tableName);
+                context.startActivity(intent);
             }
         });
 

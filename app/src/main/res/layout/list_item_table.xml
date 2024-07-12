@@ -11,12 +11,17 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:textSize="18sp"
+        android:textSize="20sp"
         android:padding="8dp" />
 
-    <Button
-        android:id="@+id/columnsButton"
+    <TextView
+        android:id="@+id/columnsTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Columns" />
+        android:textSize="15sp"
+        android:padding="8dp"
+        android:textColor="#FC69B6D9"
+        android:text="@string/columns"
+        android:gravity="end"
+        />
 </LinearLayout>
