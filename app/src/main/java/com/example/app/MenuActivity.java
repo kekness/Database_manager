@@ -43,7 +43,7 @@ public class MenuActivity extends AppCompatActivity {
     Button settings_Button;
     Button logout_Button;
     ListView tablesListView;
-    static ArrayAdapter<String> tablesAdapter;
+    static TablesAdapter tablesAdapter;
     static ArrayList<String> tablesList;
 
     @SuppressLint("MissingInflatedId")
@@ -53,13 +53,13 @@ public class MenuActivity extends AppCompatActivity {
         setContentView(R.layout.activity_menu);
         context = this;
 
-        logout_Button=findViewById(R.id.logoutButton);
+        logout_Button = findViewById(R.id.logoutButton);
         createTable_Button = findViewById(R.id.createTableButton);
         settings_Button = findViewById(R.id.settingsButton);
         tablesListView = findViewById(R.id.tablesListView);
 
         tablesList = new ArrayList<>();
-        tablesAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, tablesList);
+        tablesAdapter = new TablesAdapter(this, tablesList);
         tablesListView.setAdapter(tablesAdapter);
 
         createTable_Button.setOnClickListener(new View.OnClickListener() {
@@ -80,16 +80,7 @@ public class MenuActivity extends AppCompatActivity {
         logout_Button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivity(new Intent(MenuActivity.this,LoginActivity.class));
-            }
-        });
-
-        tablesListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                String clickedTable = tablesList.get(position);
-                config.TABLENAME = clickedTable;
-                startActivity(new Intent(MenuActivity.this, MainActivity.class));
+                startActivity(new Intent(MenuActivity.this, LoginActivity.class));
             }
         });
 
