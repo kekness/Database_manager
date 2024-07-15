@@ -219,12 +219,11 @@ public class MainActivity extends AppCompatActivity implements FetchDataTask.Fet
         try {
             JSONArray jsonArray = fun.fileToJsonArray(jsonFile);
             if (jsonArray.length() > 0) {
+                columnList.clear();
                 JSONObject jsonObject = jsonArray.getJSONObject(0);
                 for (Iterator<String> it = jsonObject.keys(); it.hasNext(); ) {
                     String key = it.next();
-                    if (!key.equals("id")) {
                         columnList.add(key);
-                    }
                 }
                 spinnerAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, columnList);
                 spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
