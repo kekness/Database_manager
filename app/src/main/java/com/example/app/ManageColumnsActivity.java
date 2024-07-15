@@ -72,7 +72,7 @@ public class ManageColumnsActivity extends AppCompatActivity {
         columnsAdapter = new ColumnsAdapter(this, columnsList);
         columnsListView.setAdapter(columnsAdapter);
 
-        loadColumnsFromJsonFile(MainActivity.jsonFile);
+        loadColumnsFromJsonFile(MenuActivity.jsonFile);
 
         addColumnButton.setOnClickListener(new View.OnClickListener() {
             @Override

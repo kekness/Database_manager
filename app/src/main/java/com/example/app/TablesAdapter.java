@@ -23,7 +23,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-public class TablesAdapter extends ArrayAdapter<String> {
+public class TablesAdapter extends ArrayAdapter<String> implements FetchDataTask.FetchDataListener {
 
     private Context context;
     private ArrayList<String> tables;
@@ -51,9 +51,9 @@ public class TablesAdapter extends ArrayAdapter<String> {
         columnsButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(context, ManageColumnsActivity.class);
-               // intent.putExtra("tableName", tableName);
-                context.startActivity(intent);
+                fetchDataFromServer(config.API_GETDATA_URL);
+                config.TABLENAME = tableName;
+
             }
         });
 
@@ -67,5 +67,17 @@ public class TablesAdapter extends ArrayAdapter<String> {
         });
 
         return convertView;
+    }
+
+    public void fetchDataFromServer(String url) {
+        new FetchDataTask(this).execute(url);
+    }
+
+    @Override
+    public void onDataFetched(String result) {
+        Log.d("SomeClass", "Response from server: " + result);
+        Intent intent = new Intent(context, ManageColumnsActivity.class);
+        // intent.putExtra("tableName", tableName);
+        context.startActivity(intent);
     }
 }

@@ -50,7 +50,7 @@ public class MainActivity extends AppCompatActivity implements FetchDataTask.Fet
     private TableLayout tableLayout;
     private ArrayList<String> columnList = new ArrayList<>();
     private ArrayAdapter<String> spinnerAdapter;
-    public static File jsonFile;
+
 
 
     @SuppressLint("MissingInflatedId")
@@ -69,13 +69,7 @@ public class MainActivity extends AppCompatActivity implements FetchDataTask.Fet
         columnSpinner = findViewById(R.id.spinner);
         tableLayout=findViewById(R.id.tableLayout);
 
-        //get actual data from saved file
-        jsonFile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS), "data.json");
 
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
-        }
 
         //button functions
         getButton.setOnClickListener(new View.OnClickListener() {
@@ -88,7 +82,7 @@ public class MainActivity extends AppCompatActivity implements FetchDataTask.Fet
         viewButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                JSONArray jsonArray = fun.fileToJsonArray(jsonFile);
+                JSONArray jsonArray = fun.fileToJsonArray(MenuActivity.jsonFile);
                 if (filter_visibility) {
                     String selectedColumn = columnSpinner.getSelectedItem().toString();
                     String filterValue = filterText.getText().toString();
@@ -101,7 +95,7 @@ public class MainActivity extends AppCompatActivity implements FetchDataTask.Fet
         addButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                showAddDialog(jsonFile);
+                showAddDialog(MenuActivity.jsonFile);
             }
         });
 
@@ -109,7 +103,7 @@ public class MainActivity extends AppCompatActivity implements FetchDataTask.Fet
             @Override
             public void onClick(View view) {
                 Log.d("przycisk", "dzialam");
-                new SaveDataAsyncTask().execute(jsonFile); //UPLOAD DATA
+                new SaveDataAsyncTask().execute(MenuActivity.jsonFile); //UPLOAD DATA
                 fetchDataFromServer(url); //DOWNLOAD DATA
             }
         });
@@ -378,8 +372,8 @@ public class MainActivity extends AppCompatActivity implements FetchDataTask.Fet
     @Override
     public void onDataFetched(String result) {
         Log.d("SomeClass", "Response from server: " + result);
-        updateTableLayout(fun.fileToJsonArray(jsonFile));
-        loadColumnNames(jsonFile);
+        updateTableLayout(fun.fileToJsonArray(MenuActivity.jsonFile));
+        loadColumnNames(MenuActivity.jsonFile);
     }
 
 }
