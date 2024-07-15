@@ -50,9 +50,8 @@ public class ManageColumnsActivity extends AppCompatActivity {
     ArrayList<String> columnsList;
     ColumnsAdapter columnsAdapter;
     String tableName;
-    JSONArray jsonArray;
-    LinearLayout itemLayout;
     TextView tableNameTextView;
+    TextView tableNameEditText;
 
     @SuppressLint("MissingInflatedId")
     @Override
@@ -62,6 +61,7 @@ public class ManageColumnsActivity extends AppCompatActivity {
 
         menuBtn = findViewById(R.id.menuButton);
         tableNameTextView = findViewById(R.id.tableNameTextView);
+        tableNameEditText=findViewById(R.id.tableNameEditText);
 
         columnsListView = findViewById(R.id.columnsListView);
         addColumnButton = findViewById(R.id.addColumnButton);
@@ -70,6 +70,8 @@ public class ManageColumnsActivity extends AppCompatActivity {
         columnsAdapter = new ColumnsAdapter(this, columnsList);
         columnsListView.setAdapter(columnsAdapter);
 
+        Intent intent = getIntent();
+        tableNameEditText.setText(intent.getStringExtra("tableName")+"'s columns");
 
         loadColumnsFromJsonFile(MenuActivity.jsonFile);
 

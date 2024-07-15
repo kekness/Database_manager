@@ -4,23 +4,41 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:padding="16dp">
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:textSize="30sp"
+        android:text="Tables" />
+
+    <ListView
+        android:id="@+id/tablesListView"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_marginTop="16dp"
+        android:padding="16dp" />
+
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:padding="16dp">
-    <Button
-        android:id="@+id/createTableButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/create_table" />
 
-    <Button
-        android:id="@+id/settingsButton"
-        android:layout_width="100dp"
-        android:layout_height="wrap_content"
-        android:text="@string/settings"
-        android:layout_marginStart="8dp" />
+        <Button
+            android:id="@+id/createTableButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/create_table" />
+
+        <Button
+            android:id="@+id/settingsButton"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:text="@string/settings"
+            android:layout_marginStart="8dp" />
+
         <Button
             android:id="@+id/logoutButton"
             android:layout_width="100dp"
@@ -28,11 +46,5 @@
             android:text="@string/logout"
             android:layout_marginStart="8dp" />
     </LinearLayout>
-    <ListView
-        android:id="@+id/tablesListView"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginTop="16dp"
-        android:padding="16dp" />
 
 </LinearLayout>

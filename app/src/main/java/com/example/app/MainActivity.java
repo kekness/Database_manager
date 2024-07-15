@@ -50,7 +50,7 @@ public class MainActivity extends AppCompatActivity implements FetchDataTask.Fet
     private TableLayout tableLayout;
     private ArrayList<String> columnList = new ArrayList<>();
     private ArrayAdapter<String> spinnerAdapter;
-
+    private TextView editTableName;
 
 
     @SuppressLint("MissingInflatedId")
@@ -68,9 +68,11 @@ public class MainActivity extends AppCompatActivity implements FetchDataTask.Fet
         filterButton = findViewById(R.id.filterButton);
         columnSpinner = findViewById(R.id.spinner);
         tableLayout=findViewById(R.id.tableLayout);
+        editTableName=findViewById(R.id.editTableName);
 
 
-
+        Intent intent = getIntent();
+        editTableName.setText(intent.getStringExtra("tableName"));
         //button functions
         getButton.setOnClickListener(new View.OnClickListener() {
             @Override

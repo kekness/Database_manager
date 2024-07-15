@@ -62,7 +62,10 @@ public class TablesAdapter extends ArrayAdapter<String> implements FetchDataTask
             public void onClick(View v) {
                 // Handle item click
                 config.TABLENAME = tableName;
-                context.startActivity(new Intent(context, MainActivity.class));
+
+                Intent intent=new Intent(context, MainActivity.class);
+                intent.putExtra("tableName",config.TABLENAME);
+                context.startActivity(intent);
             }
         });
 
@@ -77,7 +80,7 @@ public class TablesAdapter extends ArrayAdapter<String> implements FetchDataTask
     public void onDataFetched(String result) {
         Log.d("SomeClass", "Response from server: " + result);
         Intent intent = new Intent(context, ManageColumnsActivity.class);
-        // intent.putExtra("tableName", tableName);
+        intent.putExtra("tableName", config.TABLENAME);
         context.startActivity(intent);
     }
 }
