@@ -38,6 +38,7 @@ public class SettingsDialog {
             config.DATABASE = editSettingsDatabase.getText().toString();
             config.DBUSER= editSettingsUser.getText().toString();
             config.DB_PASS=editSettingsPassword.getText().toString();
+            MenuActivity.infoTv.setText("Tables in "+config.DATABASE);
             new FetchTablesTask().execute();
         });
 

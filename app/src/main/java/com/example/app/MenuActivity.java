@@ -20,6 +20,7 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -49,6 +50,7 @@ public class MenuActivity extends AppCompatActivity {
     Button settings_Button;
     Button logout_Button;
     ListView tablesListView;
+    static TextView infoTv;
     static TablesAdapter tablesAdapter;
     static ArrayList<String> tablesList;
     public static File jsonFile;
@@ -63,11 +65,13 @@ public class MenuActivity extends AppCompatActivity {
         createTable_Button = findViewById(R.id.createTableButton);
         settings_Button = findViewById(R.id.settingsButton);
         tablesListView = findViewById(R.id.tablesListView);
+        infoTv=findViewById(R.id.info_menu_TV);
 
         tablesList = new ArrayList<>();
         tablesAdapter = new TablesAdapter(this, tablesList);
         tablesListView.setAdapter(tablesAdapter);
 
+        infoTv.setText("Tables in "+config.DATABASE);
         //get actual data from saved file
         jsonFile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS), "data.json");
 
@@ -100,6 +104,8 @@ public class MenuActivity extends AppCompatActivity {
 
         // get tables from database to listview
         new FetchTablesTask().execute();
+
+
     }
 
     private void showCreateTableDialog() {
