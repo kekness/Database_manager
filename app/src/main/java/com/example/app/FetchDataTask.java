@@ -20,11 +20,14 @@ import java.net.URLEncoder;
 
 // AsyncTask to fetch data from a server and update UI
 public class FetchDataTask extends AsyncTask<String, Void, String> {
-    private MainActivity mainActivity;
+    public interface FetchDataListener {
+        void onDataFetched(String result);
+    }
 
-    // Constructor to initialize with required parameters
-    public FetchDataTask(MainActivity mainActivity) {
-        this.mainActivity = mainActivity;
+    private FetchDataListener listener;
+
+    public FetchDataTask(FetchDataListener listener) {
+        this.listener = listener;
     }
 
     // Background task to execute HTTP POST request
@@ -73,20 +76,19 @@ public class FetchDataTask extends AsyncTask<String, Void, String> {
     protected void onPostExecute(String result) {
         super.onPostExecute(result);
         Log.d("FetchDataTask", "Response from server: " + result);
-        try {
-            // Convert response to JSONArray (assuming server response is JSON array)
-            JSONArray jsonArray = new JSONArray(result);
 
-            // Save response to a file
+            // Convert response to JSONArray (assuming server response is JSON array)
+        // Save response to a file
             fun.saveToFile(result);
 
             // Update UI (MainActivity) with the JSON array data
-            mainActivity.updateTableLayout(jsonArray);
+          //  mainActivity.updateTableLayout(jsonArray);
 
             //load columnes to filter spinner
-            mainActivity.loadColumnNames(MainActivity.jsonFile);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+          //  mainActivity.loadColumnNames(MainActivity.jsonFile);
+            if (listener != null) {
+                listener.onDataFetched(result);
+            }
+
     }
 }

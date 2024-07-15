@@ -35,7 +35,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements FetchDataTask.FetchDataListener {
 
     private Button getButton;
     private Button addButton;
@@ -51,6 +51,7 @@ public class MainActivity extends AppCompatActivity {
     private ArrayList<String> columnList = new ArrayList<>();
     private ArrayAdapter<String> spinnerAdapter;
     public static File jsonFile;
+
 
     @SuppressLint("MissingInflatedId")
     @Override
@@ -80,7 +81,7 @@ public class MainActivity extends AppCompatActivity {
         getButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                new FetchDataTask(MainActivity.this).execute(url);
+                fetchDataFromServer(url);
             }
         });
 
@@ -109,7 +110,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 Log.d("przycisk", "dzialam");
                 new SaveDataAsyncTask().execute(jsonFile); //UPLOAD DATA
-                new FetchDataTask(MainActivity.this).execute(url); //DOWNLOAD DATA
+                fetchDataFromServer(url); //DOWNLOAD DATA
             }
         });
 
@@ -136,7 +137,8 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(new Intent(MainActivity.this, MenuActivity.class));
             }
         });
-        new FetchDataTask(MainActivity.this).execute(url);
+
+        fetchDataFromServer(url);
     }
 
     public void updateTableLayout(JSONArray jsonArray) {
@@ -300,6 +302,7 @@ public class MainActivity extends AppCompatActivity {
 
         builder.show();
     }
+
     private void showEditDialog(JSONObject jsonObject, int position,JSONArray jsonArray) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Edit Record");
@@ -368,6 +371,16 @@ public class MainActivity extends AppCompatActivity {
         builder.show();
     }
 
+    public void fetchDataFromServer(String url) {
+        new FetchDataTask(this).execute(url);
+    }
+
+    @Override
+    public void onDataFetched(String result) {
+        Log.d("SomeClass", "Response from server: " + result);
+        updateTableLayout(fun.fileToJsonArray(jsonFile));
+        loadColumnNames(jsonFile);
+    }
 
 }
 
