@@ -249,8 +249,8 @@ public class ManageColumnsActivity extends AppCompatActivity {
             String columnName = getItem(position);
 
             TextView columnNameTextView = convertView.findViewById(R.id.tableNameTextView);
-            TextView deleteTextView = convertView.findViewById(R.id.columnsTextView);
-
+            TextView deleteTextView = convertView.findViewById(R.id.deleteColumnTV);
+            TextView columnTextView=convertView.findViewById(R.id.columnsTextView);
             columnNameTextView.setText(columnName);
 
             // Set item click listener
@@ -260,7 +260,7 @@ public class ManageColumnsActivity extends AppCompatActivity {
                     showEditColumnDialog(columnName,position);
                 }
             });
-            deleteTextView.setText("Delete");
+            columnTextView.setVisibility(View.INVISIBLE);
             deleteTextView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
