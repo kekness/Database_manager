@@ -15,4 +15,5 @@ public class config {
     public static String API_CREATETABLE_URL="http://"+ADDRESS+"/createTable.php";
     public static String API_GETTABLES_URL="http://"+ADDRESS+"/getTables.php";
     public static String API_MANAGECOLUMNS_URL="http://"+ADDRESS+"/editTable.php";
+    public static String API_EXECUTE_SQL_URL="http://"+ADDRESS+"/executeSQL.php";
 }

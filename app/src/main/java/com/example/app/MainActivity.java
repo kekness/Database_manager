@@ -35,7 +35,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-public class MainActivity extends AppCompatActivity implements FetchDataTask.FetchDataListener {
+public class MainActivity extends AppCompatActivity implements FetchDataTask.FetchDataListener,ExecuteSqlTask.ExecuteSqlListener {
 
     private Button getButton;
     private Button addButton;
@@ -53,6 +53,7 @@ public class MainActivity extends AppCompatActivity implements FetchDataTask.Fet
     private TextView editTableName;
     private EditText sql_query_ET;
     private TextView records_number_TV;
+    private Button executeButton;
 
     @SuppressLint("MissingInflatedId")
     @Override
@@ -60,6 +61,7 @@ public class MainActivity extends AppCompatActivity implements FetchDataTask.Fet
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        executeButton =findViewById(R.id.sql_execute_button);
         menuButton = findViewById(R.id.menuButton);
         filterText = findViewById(R.id.editTextFilter);
         getButton = findViewById(R.id.myButton);
@@ -104,9 +106,15 @@ public class MainActivity extends AppCompatActivity implements FetchDataTask.Fet
             @Override
             public void onClick(View v) {
                 showAddDialog(MenuActivity.jsonFile);
+
             }
         });
-
+        executeButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+                    public void onClick(View view) {
+                executeSqlQuery(sql_query_ET.getText().toString());
+            }
+        });
         syncButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -373,7 +381,9 @@ public class MainActivity extends AppCompatActivity implements FetchDataTask.Fet
 
         builder.show();
     }
-
+    private void executeSqlQuery(String query) {
+        new ExecuteSqlTask(this).execute(query);
+    }
     public void fetchDataFromServer(String url) {
         new FetchDataTask(this).execute(url);
     }
@@ -386,6 +396,13 @@ public class MainActivity extends AppCompatActivity implements FetchDataTask.Fet
         records_number_TV.setText("Found "+fun.fileToJsonArray(MenuActivity.jsonFile).length()+" records");
     }
 
+
+    @Override
+    public void onSqlExecuted(String result) {
+        updateTableLayout(fun.fileToJsonArray(MenuActivity.jsonFile));
+        loadColumnNames(MenuActivity.jsonFile);
+        records_number_TV.setText("Found "+fun.fileToJsonArray(MenuActivity.jsonFile).length()+" records");
+    }
 }
 
 

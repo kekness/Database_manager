@@ -27,12 +27,14 @@ public class FetchTablesTask extends AsyncTask<Void, Void, String> {
     protected String doInBackground(Void... params) {
         String result = "";
         try {
+            //connection
             URL url = new URL(config.API_GETTABLES_URL);
             HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
             urlConnection.setRequestMethod("POST");
             urlConnection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
             urlConnection.setDoOutput(true);
 
+            //create data to POST to API
             String postData = "servername=" + URLEncoder.encode(config.ADDRESS, "UTF-8") +
                     "&username=" + URLEncoder.encode(config.DBUSER, "UTF-8") +
                     "&password=" + URLEncoder.encode(config.DB_PASS, "UTF-8") +
