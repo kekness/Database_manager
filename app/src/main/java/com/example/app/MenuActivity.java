@@ -43,7 +43,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-public class MenuActivity extends AppCompatActivity {
+public class MenuActivity extends AppCompatActivity implements TablesAdapter.OnTableDeletedListener{
 
     public static Context context;
     Button createTable_Button;
@@ -68,7 +68,7 @@ public class MenuActivity extends AppCompatActivity {
         infoTv=findViewById(R.id.info_menu_TV);
 
         tablesList = new ArrayList<>();
-        tablesAdapter = new TablesAdapter(this, tablesList);
+        tablesAdapter = new TablesAdapter(this, tablesList,this);
         tablesListView.setAdapter(tablesAdapter);
 
         infoTv.setText("Tables in "+config.DATABASE);
@@ -268,5 +268,10 @@ public class MenuActivity extends AppCompatActivity {
                 Toast.makeText(MenuActivity.this, "Error parsing server response", Toast.LENGTH_SHORT).show();
             }
         }
+    }
+    @Override
+    public void onTableDeleted(int position) {
+        tablesList.remove(position);
+        tablesAdapter.notifyDataSetChanged();
     }
 }

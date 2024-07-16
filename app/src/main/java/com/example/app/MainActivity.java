@@ -46,7 +46,7 @@ public class MainActivity extends AppCompatActivity implements FetchDataTask.Fet
     private String url = config.API_GETDATA_URL;
     private EditText filterText;
     private Spinner columnSpinner;
-    private boolean filter_visibility = true;
+    private boolean filter_visibility = false;
     private TableLayout tableLayout;
     private ArrayList<String> columnList = new ArrayList<>();
     private ArrayAdapter<String> spinnerAdapter;
@@ -70,6 +70,8 @@ public class MainActivity extends AppCompatActivity implements FetchDataTask.Fet
         tableLayout=findViewById(R.id.tableLayout);
         editTableName=findViewById(R.id.editTableName);
 
+        columnSpinner.setVisibility(View.INVISIBLE);
+        filterText.setVisibility(View.INVISIBLE);
 
         Intent intent = getIntent();
         editTableName.setText(intent.getStringExtra("tableName"));

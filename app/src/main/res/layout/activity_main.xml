@@ -21,7 +21,7 @@
             android:id="@+id/filterButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="filter: ON" />
+            android:text="filter: OFF" />
 
         <Spinner
             android:id="@+id/spinner"
