@@ -51,7 +51,8 @@ public class MainActivity extends AppCompatActivity implements FetchDataTask.Fet
     private ArrayList<String> columnList = new ArrayList<>();
     private ArrayAdapter<String> spinnerAdapter;
     private TextView editTableName;
-
+    private EditText sql_query_ET;
+    private TextView records_number_TV;
 
     @SuppressLint("MissingInflatedId")
     @Override
@@ -69,6 +70,8 @@ public class MainActivity extends AppCompatActivity implements FetchDataTask.Fet
         columnSpinner = findViewById(R.id.spinner);
         tableLayout=findViewById(R.id.tableLayout);
         editTableName=findViewById(R.id.editTableName);
+        sql_query_ET=findViewById(R.id.sql_querry_ET);
+        records_number_TV=findViewById(R.id.number_of_records_TV);
 
         columnSpinner.setVisibility(View.INVISIBLE);
         filterText.setVisibility(View.INVISIBLE);
@@ -92,6 +95,7 @@ public class MainActivity extends AppCompatActivity implements FetchDataTask.Fet
                     String filterValue = filterText.getText().toString();
                     jsonArray = fun.filterJsonArray(jsonArray, selectedColumn, filterValue);
                 }
+                records_number_TV.setText("Found "+jsonArray.length()+" records");
                 updateTableLayout(jsonArray);
             }
         });
@@ -128,6 +132,8 @@ public class MainActivity extends AppCompatActivity implements FetchDataTask.Fet
                 }
             }
         });
+
+        //ZAQ1@3WSX
 
         menuButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -377,6 +383,7 @@ public class MainActivity extends AppCompatActivity implements FetchDataTask.Fet
         Log.d("SomeClass", "Response from server: " + result);
         updateTableLayout(fun.fileToJsonArray(MenuActivity.jsonFile));
         loadColumnNames(MenuActivity.jsonFile);
+        records_number_TV.setText("Found "+fun.fileToJsonArray(MenuActivity.jsonFile).length()+" records");
     }
 
 }

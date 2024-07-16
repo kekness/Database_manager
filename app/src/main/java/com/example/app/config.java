@@ -1,7 +1,7 @@
 package com.example.app;
 
 public class config {
-    public static String ADDRESS = "192.168.210.117";
+    public static String ADDRESS = "192.168.171.89";
     public static String DATABASE="test";
     public static String TABLENAME="nexttable";
     public static String DBUSER="API";
