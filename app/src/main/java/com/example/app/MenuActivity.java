@@ -43,17 +43,19 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-public class MenuActivity extends AppCompatActivity implements TablesAdapter.OnTableDeletedListener{
+public class MenuActivity extends AppCompatActivity implements TablesAdapter.OnTableDeletedListener,FetchDataTask.FetchDataListener{
 
     public static Context context;
     Button createTable_Button;
     Button settings_Button;
     Button logout_Button;
+    Button exportButton;
     ListView tablesListView;
     static TextView infoTv;
     static TablesAdapter tablesAdapter;
     static ArrayList<String> tablesList;
     public static File jsonFile;
+
     @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,6 +68,7 @@ public class MenuActivity extends AppCompatActivity implements TablesAdapter.OnT
         settings_Button = findViewById(R.id.settingsButton);
         tablesListView = findViewById(R.id.tablesListView);
         infoTv=findViewById(R.id.info_menu_TV);
+        exportButton=findViewById(R.id.export_button);
 
         tablesList = new ArrayList<>();
         tablesAdapter = new TablesAdapter(this, tablesList,this);
@@ -102,7 +105,15 @@ public class MenuActivity extends AppCompatActivity implements TablesAdapter.OnT
             }
         });
 
-        // get tables from database to listview
+        exportButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+               config.TABLENAME="t2";
+
+              fetchDataFromServer();
+            }
+        });
+
         new FetchTablesTask().execute();
 
 
@@ -273,5 +284,14 @@ public class MenuActivity extends AppCompatActivity implements TablesAdapter.OnT
     public void onTableDeleted(int position) {
         tablesList.remove(position);
         tablesAdapter.notifyDataSetChanged();
+    }
+    public void fetchDataFromServer()
+    {
+        new FetchDataTask(this).execute(config.API_GETDATA_URL);
+    }
+    @Override
+    public void onDataFetched(String result) {
+        Log.d("SomeClass", "Response from server: " + result);
+        fun.exportDataToCSV(config.TABLENAME,jsonFile);
     }
 }

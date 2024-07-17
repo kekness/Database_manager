@@ -164,8 +164,6 @@ public class MainActivity extends AppCompatActivity implements FetchDataTask.Fet
             }
         });
 
-
-
         // Set up the listener for sqlSpinner
         sqlSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -427,6 +425,10 @@ public class MainActivity extends AppCompatActivity implements FetchDataTask.Fet
         new FetchDataTask(this).execute(url);
     }
 
+
+    //interfaces to execute certain functions after response from server
+
+    //interface after fetching data from server
     @Override
     public void onDataFetched(String result) {
         tableshown = "data.json";
@@ -436,6 +438,7 @@ public class MainActivity extends AppCompatActivity implements FetchDataTask.Fet
         records_number_TV.setText("Found " + fun.fileToJsonArray(MenuActivity.jsonFile).length() + " records");
     }
 
+    //interface after sql query executed
     @Override
     public void onSqlExecuted(String result) {
         tableshown = "sql.json";
