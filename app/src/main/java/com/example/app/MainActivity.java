@@ -12,6 +12,7 @@ import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -25,6 +26,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -35,7 +37,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-public class MainActivity extends AppCompatActivity implements FetchDataTask.FetchDataListener,ExecuteSqlTask.ExecuteSqlListener {
+public class MainActivity extends AppCompatActivity implements FetchDataTask.FetchDataListener, ExecuteSqlTask.ExecuteSqlListener {
 
     private Button getButton;
     private Button addButton;
@@ -49,12 +51,15 @@ public class MainActivity extends AppCompatActivity implements FetchDataTask.Fet
     private boolean filter_visibility = false;
     private TableLayout tableLayout;
     private ArrayList<String> columnList = new ArrayList<>();
+    private ArrayList<String> queryList = new ArrayList<>();
     private ArrayAdapter<String> spinnerAdapter;
     private TextView editTableName;
     private EditText sql_query_ET;
     private TextView records_number_TV;
     private Button executeButton;
     public File sqlFile;
+    public String tableshown;
+    private Spinner sqlSpinner;
 
     @SuppressLint("MissingInflatedId")
     @Override
@@ -62,7 +67,7 @@ public class MainActivity extends AppCompatActivity implements FetchDataTask.Fet
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        executeButton =findViewById(R.id.sql_execute_button);
+        executeButton = findViewById(R.id.sql_execute_button);
         menuButton = findViewById(R.id.menuButton);
         filterText = findViewById(R.id.editTextFilter);
         getButton = findViewById(R.id.myButton);
@@ -71,10 +76,11 @@ public class MainActivity extends AppCompatActivity implements FetchDataTask.Fet
         viewButton = findViewById(R.id.viewButton);
         filterButton = findViewById(R.id.filterButton);
         columnSpinner = findViewById(R.id.spinner);
-        tableLayout=findViewById(R.id.tableLayout);
-        editTableName=findViewById(R.id.editTableName);
-        sql_query_ET=findViewById(R.id.sql_querry_ET);
-        records_number_TV=findViewById(R.id.number_of_records_TV);
+        tableLayout = findViewById(R.id.tableLayout);
+        editTableName = findViewById(R.id.editTableName);
+        sql_query_ET = findViewById(R.id.sql_querry_ET);
+        records_number_TV = findViewById(R.id.number_of_records_TV);
+        sqlSpinner = findViewById(R.id.sqlhistorySpinner);
 
         columnSpinner.setVisibility(View.INVISIBLE);
         filterText.setVisibility(View.INVISIBLE);
@@ -95,13 +101,17 @@ public class MainActivity extends AppCompatActivity implements FetchDataTask.Fet
         viewButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                JSONArray jsonArray = fun.fileToJsonArray(MenuActivity.jsonFile);
+                JSONArray jsonArray;
+                if (tableshown == "data.json")
+                    jsonArray = fun.fileToJsonArray(MenuActivity.jsonFile);
+                else
+                    jsonArray = fun.fileToJsonArray(sqlFile);
                 if (filter_visibility) {
                     String selectedColumn = columnSpinner.getSelectedItem().toString();
                     String filterValue = filterText.getText().toString();
                     jsonArray = fun.filterJsonArray(jsonArray, selectedColumn, filterValue);
                 }
-                records_number_TV.setText("Found "+jsonArray.length()+" records");
+                records_number_TV.setText("Found " + jsonArray.length() + " records");
                 updateTableLayout(jsonArray);
             }
         });
@@ -110,15 +120,17 @@ public class MainActivity extends AppCompatActivity implements FetchDataTask.Fet
             @Override
             public void onClick(View v) {
                 showAddDialog(MenuActivity.jsonFile);
-
             }
         });
+
         executeButton.setOnClickListener(new View.OnClickListener() {
             @Override
-                    public void onClick(View view) {
+            public void onClick(View view) {
                 executeSqlQuery(sql_query_ET.getText().toString());
+                loadSqlSpinner(sql_query_ET.getText().toString());
             }
         });
+
         syncButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -145,12 +157,26 @@ public class MainActivity extends AppCompatActivity implements FetchDataTask.Fet
             }
         });
 
-        //ZAQ1@3WSX
-
         menuButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 startActivity(new Intent(MainActivity.this, MenuActivity.class));
+            }
+        });
+
+
+
+        // Set up the listener for sqlSpinner
+        sqlSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                String selectedQuery = (String) parent.getItemAtPosition(position);
+                sql_query_ET.setText(selectedQuery);
+             //   executeSqlQuery(sql_query_ET.getText().toString());
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
             }
         });
         fetchDataFromServer(url);
@@ -191,7 +217,7 @@ public class MainActivity extends AppCompatActivity implements FetchDataTask.Fet
             e.printStackTrace();
         }
 
-        // add actuall data
+        // add actual data
         for (int i = 0; i < jsonArray.length(); i++) {
             try {
                 JSONObject jsonObject = jsonArray.getJSONObject(i);
@@ -205,7 +231,7 @@ public class MainActivity extends AppCompatActivity implements FetchDataTask.Fet
                 tableRow.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        showEditDialog(jsonObject, position,jsonArray);
+                        showEditDialog(jsonObject, position, jsonArray);
                     }
                 });
 
@@ -220,7 +246,7 @@ public class MainActivity extends AppCompatActivity implements FetchDataTask.Fet
                     textView.setLayoutParams(new TableRow.LayoutParams(
                             TableRow.LayoutParams.WRAP_CONTENT,
                             TableRow.LayoutParams.WRAP_CONTENT));
-                    textView.setGravity(Gravity.CENTER); // Wycentrowanie tekstu
+                    textView.setGravity(Gravity.CENTER); // Center the text
 
                     tableRow.addView(textView);
                 }
@@ -242,7 +268,7 @@ public class MainActivity extends AppCompatActivity implements FetchDataTask.Fet
                 JSONObject jsonObject = jsonArray.getJSONObject(0);
                 for (Iterator<String> it = jsonObject.keys(); it.hasNext(); ) {
                     String key = it.next();
-                        columnList.add(key);
+                    columnList.add(key);
                 }
                 spinnerAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, columnList);
                 spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -251,6 +277,14 @@ public class MainActivity extends AppCompatActivity implements FetchDataTask.Fet
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    //loads String to sqlSpinner
+    public void loadSqlSpinner(String sqlquery) {
+        queryList.add(sqlquery);
+        spinnerAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, queryList);
+        spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        sqlSpinner.setAdapter(spinnerAdapter);
     }
 
     private void showAddDialog(File jsonFile) {
@@ -317,7 +351,7 @@ public class MainActivity extends AppCompatActivity implements FetchDataTask.Fet
         builder.show();
     }
 
-    private void showEditDialog(JSONObject jsonObject, int position,JSONArray jsonArray) {
+    private void showEditDialog(JSONObject jsonObject, int position, JSONArray jsonArray) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Edit Record");
 
@@ -351,20 +385,20 @@ public class MainActivity extends AppCompatActivity implements FetchDataTask.Fet
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 try {
-                    // Aktualizacja danych w jsonObject na podstawie wprowadzonych wartości
+                    // Update the data in jsonObject based on the entered values
                     for (Map.Entry<String, EditText> entry : editTextMap.entrySet()) {
                         String key = entry.getKey();
                         String newValue = entry.getValue().getText().toString();
                         jsonObject.put(key, newValue);
                     }
 
-                    // Zaktualizowanie jsonArray pod odpowiednim indeksem
+                    // Update jsonArray at the appropriate index
                     jsonArray.put(position, jsonObject);
 
-                    // Odświeżenie tabeli po edycji
+                    // Refresh the table after editing
                     updateTableLayout(jsonArray);
 
-                    // Zapisanie zmian do pliku JSON
+                    // Save changes to JSON file
                     File jsonFile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS), "data.json");
                     fun.saveJsonArrayToFile(jsonArray, jsonFile);
 
@@ -384,30 +418,29 @@ public class MainActivity extends AppCompatActivity implements FetchDataTask.Fet
 
         builder.show();
     }
+
     private void executeSqlQuery(String query) {
         new ExecuteSqlTask(this).execute(query);
     }
+
     public void fetchDataFromServer(String url) {
         new FetchDataTask(this).execute(url);
     }
 
     @Override
     public void onDataFetched(String result) {
+        tableshown = "data.json";
         Log.d("SomeClass", "Response from server: " + result);
         updateTableLayout(fun.fileToJsonArray(MenuActivity.jsonFile));
         loadColumnNames(MenuActivity.jsonFile);
-        records_number_TV.setText("Found "+fun.fileToJsonArray(MenuActivity.jsonFile).length()+" records");
+        records_number_TV.setText("Found " + fun.fileToJsonArray(MenuActivity.jsonFile).length() + " records");
     }
-
 
     @Override
     public void onSqlExecuted(String result) {
+        tableshown = "sql.json";
         updateTableLayout(fun.fileToJsonArray(sqlFile));
         loadColumnNames(sqlFile);
-        records_number_TV.setText("Found "+fun.fileToJsonArray(sqlFile).length()+" records");
+        records_number_TV.setText("Found " + fun.fileToJsonArray(sqlFile).length() + " records");
     }
 }
-
-
-
-
