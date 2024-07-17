@@ -54,6 +54,7 @@ public class MainActivity extends AppCompatActivity implements FetchDataTask.Fet
     private EditText sql_query_ET;
     private TextView records_number_TV;
     private Button executeButton;
+    public File sqlFile;
 
     @SuppressLint("MissingInflatedId")
     @Override
@@ -78,8 +79,11 @@ public class MainActivity extends AppCompatActivity implements FetchDataTask.Fet
         columnSpinner.setVisibility(View.INVISIBLE);
         filterText.setVisibility(View.INVISIBLE);
 
+        sqlFile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS), "sql.json");
+
         Intent intent = getIntent();
         editTableName.setText(intent.getStringExtra("tableName"));
+
         //button functions
         getButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -149,7 +153,6 @@ public class MainActivity extends AppCompatActivity implements FetchDataTask.Fet
                 startActivity(new Intent(MainActivity.this, MenuActivity.class));
             }
         });
-
         fetchDataFromServer(url);
     }
 
@@ -399,9 +402,9 @@ public class MainActivity extends AppCompatActivity implements FetchDataTask.Fet
 
     @Override
     public void onSqlExecuted(String result) {
-        updateTableLayout(fun.fileToJsonArray(MenuActivity.jsonFile));
-        loadColumnNames(MenuActivity.jsonFile);
-        records_number_TV.setText("Found "+fun.fileToJsonArray(MenuActivity.jsonFile).length()+" records");
+        updateTableLayout(fun.fileToJsonArray(sqlFile));
+        loadColumnNames(sqlFile);
+        records_number_TV.setText("Found "+fun.fileToJsonArray(sqlFile).length()+" records");
     }
 }
 

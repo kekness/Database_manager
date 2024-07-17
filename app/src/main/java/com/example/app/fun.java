@@ -112,10 +112,10 @@ public class fun {
     }
 
     //save data from string to data.json
-    public static void saveToFile(String data) {
+    public static void saveToFile(String data,String pathToFile) {
         try {
             File path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS);
-            File file = new File(path, "data.json");
+            File file = new File(path, pathToFile);
 
             if (!path.exists()) {
                 path.mkdirs();

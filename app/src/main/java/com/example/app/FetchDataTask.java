@@ -78,7 +78,7 @@ public class FetchDataTask extends AsyncTask<String, Void, String> {
         Log.d("FetchDataTask", "Response from server: " + result);
 
         // Save response to a file
-            fun.saveToFile(result);
+            fun.saveToFile(result,"data.json");
 
             //functions from interface are done
             if (listener != null) {

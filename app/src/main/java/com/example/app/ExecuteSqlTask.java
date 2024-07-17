@@ -65,7 +65,7 @@ public class ExecuteSqlTask extends AsyncTask<String, Void, String> {
     protected void onPostExecute(String result) {
         super.onPostExecute(result);
         Log.d("ExecuteSqlTask", "Response from server: " + result);
-        fun.saveToFile(result);
+        fun.saveToFile(result,"sql.json");
         if (listener != null) {
             listener.onSqlExecuted(result);
         }
