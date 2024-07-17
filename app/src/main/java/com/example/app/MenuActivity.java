@@ -293,5 +293,6 @@ public class MenuActivity extends AppCompatActivity implements TablesAdapter.OnT
     public void onDataFetched(String result) {
         Log.d("SomeClass", "Response from server: " + result);
         fun.exportDataToCSV(config.TABLENAME,jsonFile);
+        Toast.makeText(MenuActivity.this,"Table exported to /Download/"+config.TABLENAME+".csv",Toast.LENGTH_SHORT).show();
     }
 }
