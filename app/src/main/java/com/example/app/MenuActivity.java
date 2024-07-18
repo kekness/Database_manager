@@ -50,6 +50,7 @@ public class MenuActivity extends AppCompatActivity implements TablesAdapter.OnT
     Button settings_Button;
     Button logout_Button;
     Button exportButton;
+    Button importButton;
     ListView tablesListView;
     static TextView infoTv;
     static TablesAdapter tablesAdapter;
@@ -63,6 +64,7 @@ public class MenuActivity extends AppCompatActivity implements TablesAdapter.OnT
         setContentView(R.layout.activity_menu);
         context = this;
 
+        importButton=findViewById(R.id.import_button);
         logout_Button = findViewById(R.id.logoutButton);
         createTable_Button = findViewById(R.id.createTableButton);
         settings_Button = findViewById(R.id.settingsButton);
@@ -87,6 +89,13 @@ public class MenuActivity extends AppCompatActivity implements TablesAdapter.OnT
             @Override
             public void onClick(View v) {
                 showCreateTableDialog();
+            }
+        });
+
+        importButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
             }
         });
 

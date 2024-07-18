@@ -22,6 +22,7 @@
     <string name="insert_table">insert</string>
     <string name="admin_panel">admin panel</string>
     <string name="export">export</string>
+    <string name="import_table">import table</string>
     <string-array name="column_types">
         <item>INT</item>
         <item>VARCHAR(255)</item>

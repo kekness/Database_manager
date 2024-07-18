@@ -30,10 +30,10 @@
         android:gravity="center_vertical">
 
         <Button
-            android:id="@+id/insert_button"
+            android:id="@+id/import_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/insert_table"
+            android:text="@string/import_table"
             android:layout_marginEnd="8dp" />
         <Button
             android:id="@+id/export_button"
