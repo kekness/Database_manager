@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
@@ -33,6 +34,8 @@ import org.json.JSONObject;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
@@ -95,7 +98,7 @@ public class MenuActivity extends AppCompatActivity implements TablesAdapter.OnT
         importButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                openFilePicker();
             }
         });
 
@@ -127,6 +130,102 @@ public class MenuActivity extends AppCompatActivity implements TablesAdapter.OnT
 
 
     }
+    private void openFilePicker() {
+        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+        intent.setType("*/*");
+        startActivityForResult(intent, 3);
+    }
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 3 && resultCode == RESULT_OK && data != null) {
+            Uri uri = data.getData();
+            showImportTableDialog(uri);
+            assert uri != null;
+            Log.d("nw czyddziala",uri.toString());
+        }
+    }
+    private void showImportTableDialog(Uri uri) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Import Table");
+
+        LayoutInflater inflater = this.getLayoutInflater();
+        View dialogView = inflater.inflate(R.layout.dialog_importtable, null);
+        builder.setView(dialogView);
+
+        final EditText tableNameEditText = dialogView.findViewById(R.id.tableNameEditText);
+
+        builder.setPositiveButton("Import", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                String tableName = tableNameEditText.getText().toString();
+                if (!tableName.isEmpty()) {
+                    ArrayList<Map<String, String>> columns = parseCSVAndGetColumns(uri);
+                    for (int i = 0; i < columns.size(); i++) {
+                        Log.d("Columns", "Row " + i + ": " + columns.get(i).toString());
+                    }
+                    if (columns != null && !columns.isEmpty()) {
+                        new CreateTableTask().execute(tableName, columns);
+                    } else {
+                        Toast.makeText(MenuActivity.this, "Error parsing CSV file", Toast.LENGTH_SHORT).show();
+                    }
+                } else {
+                    Toast.makeText(MenuActivity.this, "Please enter table name", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+
+        builder.show();
+    }
+
+
+    private ArrayList<Map<String, String>> parseCSVAndGetColumns(Uri uri) {
+        ArrayList<Map<String, String>> columns = new ArrayList<>();
+
+        try {
+            InputStream inputStream = getContentResolver().openInputStream(uri);
+            BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+
+            // Read the first line to get column headers
+            String line = reader.readLine();
+            if (line != null) {
+                // Split line by comma, ignoring commas inside quotes
+                String[] headers = line.split(",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)");
+
+                // Remove surrounding quotes and trim headers
+                for (int i = 0; i < headers.length; i++) {
+                    headers[i] = headers[i].replaceAll("^\"|\"$", "").trim();
+                }
+
+                // Assume headers are names of columns, adjust for your CSV format if needed
+                for (String header : headers) {
+                    // Check if the header is "id" and skip adding it to columns
+                    if (!header.equalsIgnoreCase("id")) {
+                        Map<String, String> column = new HashMap<>();
+                        column.put("name", header);
+                        column.put("type", "TEXT"); // Assuming default type is TEXT
+                        columns.add(column);
+                    }
+                }
+            }
+
+            reader.close();
+            inputStream.close();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return columns;
+    }
+
 
     private void showCreateTableDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -205,6 +304,8 @@ public class MenuActivity extends AppCompatActivity implements TablesAdapter.OnT
                     column.put("type", columnTypes.get(i).getSelectedItem().toString());
                     columns.add(column);
                 }
+                for (int i = 0; i < columns.size(); i++)
+                    Log.d("Columns2", "Row " + i + ": " + columns.get(i).toString());
                 new CreateTableTask().execute(tableName, columns);
             }
         });

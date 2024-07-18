@@ -252,8 +252,6 @@ public class fun {
         return jsonString.toString();
     }
 
-
-
     private static ArrayList<ArrayList<String>> getDataForTable(File jsonFile) {
         ArrayList<ArrayList<String>> data = new ArrayList<>();
 
@@ -294,5 +292,23 @@ public class fun {
 
         return data;
     }
+
+    public static JSONArray convertCSVToJson(String csvData) throws JSONException {
+        JSONArray jsonArray = new JSONArray();
+        String[] lines = csvData.split("\n");
+        if (lines.length > 0) {
+            String[] headers = lines[0].split(",");
+            for (int i = 1; i < lines.length; i++) {
+                String[] values = lines[i].split(",");
+                JSONObject jsonObject = new JSONObject();
+                for (int j = 0; j < headers.length; j++) {
+                    jsonObject.put(headers[j], values[j]);
+                }
+                jsonArray.put(jsonObject);
+            }
+        }
+        return jsonArray;
+    }
+
 
 }
