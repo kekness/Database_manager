@@ -179,7 +179,7 @@ public class fun {
         return stringBuilder.toString();
     }
 
-    public static void exportDataToCSV(String tableName,File jsonFile) {
+    public static void exportDataToCSV(String tableName,File jsonFile,String exportname) {
         // Wczytaj dane z pliku JSON
         String jsonString = readJsonFromFile(jsonFile);
         if (jsonString == null || jsonString.isEmpty()) {
@@ -196,7 +196,7 @@ public class fun {
             }
 
             // Ścieżka do miejsca docelowego dla pliku CSV
-            String csvFilePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS) + "/"+tableName+".csv";
+            String csvFilePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS) + "/"+exportname+".csv";
 
             // Tworzenie obiektu BufferedWriter do zapisu do pliku
             BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(csvFilePath), "UTF-8"));

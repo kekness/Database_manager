@@ -59,6 +59,7 @@ public class MenuActivity extends AppCompatActivity implements TablesAdapter.OnT
     static TablesAdapter tablesAdapter;
     static ArrayList<String> tablesList;
     public static File jsonFile;
+    public String exportname;
 
     @SuppressLint("MissingInflatedId")
     @Override
@@ -120,9 +121,7 @@ public class MenuActivity extends AppCompatActivity implements TablesAdapter.OnT
         exportButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-               config.TABLENAME="t2";
-
-              fetchDataFromServer();
+                showExportDialog();
             }
         });
 
@@ -171,6 +170,46 @@ public class MenuActivity extends AppCompatActivity implements TablesAdapter.OnT
                     }
                 } else {
                     Toast.makeText(MenuActivity.this, "Please enter table name", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+
+        builder.show();
+    }
+    private void showExportDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Export Table");
+
+        LayoutInflater inflater = this.getLayoutInflater();
+        View dialogView = inflater.inflate(R.layout.dialog_exporttable, null);
+        builder.setView(dialogView);
+
+        Spinner tablesSpinner = dialogView.findViewById(R.id.spinnerTables);
+        EditText exportName = dialogView.findViewById(R.id.tableNameEditText);
+
+        // Create an ArrayAdapter using the list of tables
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, tablesList);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        tablesSpinner.setAdapter(adapter);
+
+        builder.setPositiveButton("Export", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                String selectedTable = tablesSpinner.getSelectedItem().toString();
+                exportname = exportName.getText().toString();
+
+                if (!exportname.isEmpty()) {
+                    config.TABLENAME = selectedTable;
+                    fetchDataFromServer();
+                } else {
+                    Toast.makeText(MenuActivity.this, "Please enter export name", Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -322,7 +361,6 @@ public class MenuActivity extends AppCompatActivity implements TablesAdapter.OnT
     }
 
     private class CreateTableTask extends AsyncTask<Object, Void, String> {
-
         @Override
         protected String doInBackground(Object... params) {
             String tableName = (String) params[0];
@@ -337,8 +375,14 @@ public class MenuActivity extends AppCompatActivity implements TablesAdapter.OnT
 
                 StringBuilder columnDefinitions = new StringBuilder();
                 for (Map<String, String> column : columns) {
-                    columnDefinitions.append(column.get("name")).append(" ").append(column.get("type")).append(",");
+                    String columnName = column.get("name").replace(" ", "_"); // Replace spaces with underscores
+                    Log.d("ColumnName", "Original: " + column.get("name") + " | Replaced: " + columnName);
+                    columnDefinitions.append(columnName).append(" ").append(column.get("type")).append(",");
                 }
+
+                // Log column definitions before removing the last comma
+                Log.d("ColumnDefinitions", columnDefinitions.toString());
+
                 columnDefinitions.setLength(columnDefinitions.length() - 1); // Remove last comma
 
                 String postData = "servername=" + URLEncoder.encode(config.ADDRESS, "UTF-8") +
@@ -347,6 +391,8 @@ public class MenuActivity extends AppCompatActivity implements TablesAdapter.OnT
                         "&dbname=" + URLEncoder.encode(config.DATABASE, "UTF-8") +
                         "&tablename=" + URLEncoder.encode(tableName, "UTF-8") +
                         "&columns=" + URLEncoder.encode(columnDefinitions.toString(), "UTF-8");
+
+                Log.d("PostData", postData); // Log the post data to see what is being sent
 
                 OutputStream os = urlConnection.getOutputStream();
                 BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"));
@@ -365,8 +411,12 @@ public class MenuActivity extends AppCompatActivity implements TablesAdapter.OnT
 
                 result = response.toString();
 
+                // Log the server response
+                Log.d("ServerResponse", result);
+
             } catch (Exception e) {
                 e.printStackTrace();
+                Log.e("CreateTableTask", "Error: " + e.getMessage());
                 result = e.getMessage();
             }
             return result;
@@ -390,6 +440,7 @@ public class MenuActivity extends AppCompatActivity implements TablesAdapter.OnT
             }
         }
     }
+
     @Override
     public void onTableDeleted(int position) {
         tablesList.remove(position);
@@ -402,7 +453,7 @@ public class MenuActivity extends AppCompatActivity implements TablesAdapter.OnT
     @Override
     public void onDataFetched(String result) {
         Log.d("SomeClass", "Response from server: " + result);
-        fun.exportDataToCSV(config.TABLENAME,jsonFile);
-        Toast.makeText(MenuActivity.this,"Table exported to /Download/"+config.TABLENAME+".csv",Toast.LENGTH_SHORT).show();
+        fun.exportDataToCSV(config.TABLENAME,jsonFile,exportname);
+        Toast.makeText(MenuActivity.this,"Table exported to /Download/"+exportname+".csv",Toast.LENGTH_SHORT).show();
     }
 }
