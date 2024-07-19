@@ -28,6 +28,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
+import com.opencsv.CSVParser;
+import com.opencsv.CSVParserBuilder;
 import com.opencsv.CSVReader;
 
 import org.json.JSONArray;
@@ -48,6 +50,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import com.opencsv.CSVReader;
+import com.opencsv.CSVReaderBuilder;
 import com.opencsv.exceptions.CsvValidationException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -241,10 +244,30 @@ public class MenuActivity extends AppCompatActivity implements TablesAdapter.OnT
 
         try {
             InputStream inputStream = getContentResolver().openInputStream(uri);
-            BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
-            CSVReader csvReader = new CSVReader(reader);
+            InputStreamReader streamReader = new InputStreamReader(inputStream);
+            BufferedReader bufferedReader = new BufferedReader(streamReader);
 
-            // Read the first line to get column headers
+            // Read the first line to determine the separator
+            String firstLine = bufferedReader.readLine();
+            char separator = detectSeparator(firstLine);
+
+            // Close and reopen the InputStream to reset it
+            bufferedReader.close();
+            streamReader.close();
+            inputStream.close();
+
+            inputStream = getContentResolver().openInputStream(uri);
+            streamReader = new InputStreamReader(inputStream);
+            CSVParser parser = new CSVParserBuilder()
+                    .withSeparator(separator)
+                    .withIgnoreQuotations(false)
+                    .build();
+
+            CSVReader csvReader = new CSVReaderBuilder(streamReader)
+                    .withCSVParser(parser)
+                    .build();
+
+            // Re-read the first line to get column headers
             String[] headers = csvReader.readNext();
             if (headers != null) {
                 // Remove surrounding quotes and trim headers
@@ -265,16 +288,31 @@ public class MenuActivity extends AppCompatActivity implements TablesAdapter.OnT
             }
 
             csvReader.close();
-            reader.close();
+            streamReader.close();
             inputStream.close();
 
-        } catch (IOException e) {
+        } catch (IOException | CsvValidationException e) {
             e.printStackTrace();
-        } catch (CsvValidationException e) {
-            throw new RuntimeException(e);
         }
 
         return columns;
+    }
+
+    // Function to detect the most likely separator in the first line
+    private char detectSeparator(String line) {
+        char[] separators = {',', ';', '\t', '|'};
+        char bestSeparator = ',';
+        int maxCount = 0;
+
+        for (char separator : separators) {
+            int count = line.length() - line.replace(String.valueOf(separator), "").length();
+            if (count > maxCount) {
+                maxCount = count;
+                bestSeparator = separator;
+            }
+        }
+
+        return bestSeparator;
     }
 
 
