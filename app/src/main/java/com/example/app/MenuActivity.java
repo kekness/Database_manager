@@ -28,6 +28,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
+import com.opencsv.CSVReader;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -45,6 +47,15 @@ import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import com.opencsv.CSVReader;
+import com.opencsv.exceptions.CsvValidationException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import android.net.Uri;
 
 public class MenuActivity extends AppCompatActivity implements TablesAdapter.OnTableDeletedListener,FetchDataTask.FetchDataListener{
 
@@ -231,13 +242,11 @@ public class MenuActivity extends AppCompatActivity implements TablesAdapter.OnT
         try {
             InputStream inputStream = getContentResolver().openInputStream(uri);
             BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+            CSVReader csvReader = new CSVReader(reader);
 
             // Read the first line to get column headers
-            String line = reader.readLine();
-            if (line != null) {
-                // Split line by comma, ignoring commas inside quotes
-                String[] headers = line.split(",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)");
-
+            String[] headers = csvReader.readNext();
+            if (headers != null) {
                 // Remove surrounding quotes and trim headers
                 for (int i = 0; i < headers.length; i++) {
                     headers[i] = headers[i].replaceAll("^\"|\"$", "").trim();
@@ -245,8 +254,8 @@ public class MenuActivity extends AppCompatActivity implements TablesAdapter.OnT
 
                 // Assume headers are names of columns, adjust for your CSV format if needed
                 for (String header : headers) {
-                    // Check if the header is "id" and skip adding it to columns
-                    if (!header.equalsIgnoreCase("id")) {
+                    // Check if the header is "id" or "index" and skip adding it to columns
+                    if (!header.equalsIgnoreCase("index") && !header.equalsIgnoreCase("id")) {
                         Map<String, String> column = new HashMap<>();
                         column.put("name", header);
                         column.put("type", "TEXT"); // Assuming default type is TEXT
@@ -255,11 +264,14 @@ public class MenuActivity extends AppCompatActivity implements TablesAdapter.OnT
                 }
             }
 
+            csvReader.close();
             reader.close();
             inputStream.close();
 
         } catch (IOException e) {
             e.printStackTrace();
+        } catch (CsvValidationException e) {
+            throw new RuntimeException(e);
         }
 
         return columns;
