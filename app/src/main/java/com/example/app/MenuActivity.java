@@ -148,6 +148,7 @@ public class MenuActivity extends AppCompatActivity implements TablesAdapter.OnT
         intent.setType("*/*");
         startActivityForResult(intent, 3);
     }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -158,6 +159,7 @@ public class MenuActivity extends AppCompatActivity implements TablesAdapter.OnT
             Log.d("nw czyddziala",uri.toString());
         }
     }
+
     private void showImportTableDialog(Uri uri) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Import Table");
@@ -197,6 +199,7 @@ public class MenuActivity extends AppCompatActivity implements TablesAdapter.OnT
 
         builder.show();
     }
+
     private void showExportDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Export Table");
@@ -237,84 +240,6 @@ public class MenuActivity extends AppCompatActivity implements TablesAdapter.OnT
 
         builder.show();
     }
-
-
-    private ArrayList<Map<String, String>> parseCSVAndGetColumns(Uri uri) {
-        ArrayList<Map<String, String>> columns = new ArrayList<>();
-
-        try {
-            InputStream inputStream = getContentResolver().openInputStream(uri);
-            InputStreamReader streamReader = new InputStreamReader(inputStream);
-            BufferedReader bufferedReader = new BufferedReader(streamReader);
-
-            // Read the first line to determine the separator
-            String firstLine = bufferedReader.readLine();
-            char separator = detectSeparator(firstLine);
-
-            // Close and reopen the InputStream to reset it
-            bufferedReader.close();
-            streamReader.close();
-            inputStream.close();
-
-            inputStream = getContentResolver().openInputStream(uri);
-            streamReader = new InputStreamReader(inputStream);
-            CSVParser parser = new CSVParserBuilder()
-                    .withSeparator(separator)
-                    .withIgnoreQuotations(false)
-                    .build();
-
-            CSVReader csvReader = new CSVReaderBuilder(streamReader)
-                    .withCSVParser(parser)
-                    .build();
-
-            // Re-read the first line to get column headers
-            String[] headers = csvReader.readNext();
-            if (headers != null) {
-                // Remove surrounding quotes and trim headers
-                for (int i = 0; i < headers.length; i++) {
-                    headers[i] = headers[i].replaceAll("^\"|\"$", "").trim();
-                }
-
-                // Assume headers are names of columns, adjust for your CSV format if needed
-                for (String header : headers) {
-                    // Check if the header is "id" or "index" and skip adding it to columns
-                    if (!header.equalsIgnoreCase("index") && !header.equalsIgnoreCase("id")) {
-                        Map<String, String> column = new HashMap<>();
-                        column.put("name", header);
-                        column.put("type", "TEXT"); // Assuming default type is TEXT
-                        columns.add(column);
-                    }
-                }
-            }
-
-            csvReader.close();
-            streamReader.close();
-            inputStream.close();
-
-        } catch (IOException | CsvValidationException e) {
-            e.printStackTrace();
-        }
-
-        return columns;
-    }
-
-    // Function to detect the most likely separator in the first line
-    private char detectSeparator(String line) {
-        char[] separators = {',', ';', '\t', '|'};
-        char bestSeparator = ',';
-        int maxCount = 0;
-
-        for (char separator : separators) {
-            int count = line.length() - line.replace(String.valueOf(separator), "").length();
-            if (count > maxCount) {
-                maxCount = count;
-                bestSeparator = separator;
-            }
-        }
-
-        return bestSeparator;
-    }
-
 
     private void showCreateTableDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -410,6 +335,65 @@ public class MenuActivity extends AppCompatActivity implements TablesAdapter.OnT
         dialog.show();
     }
 
+    private ArrayList<Map<String, String>> parseCSVAndGetColumns(Uri uri) {
+        ArrayList<Map<String, String>> columns = new ArrayList<>();
+
+        try {
+            InputStream inputStream = getContentResolver().openInputStream(uri);
+            InputStreamReader streamReader = new InputStreamReader(inputStream);
+            BufferedReader bufferedReader = new BufferedReader(streamReader);
+
+            // Read the first line to determine the separator
+            String firstLine = bufferedReader.readLine();
+            char separator = fun.detectSeparator(firstLine);
+
+            // Close and reopen the InputStream to reset it
+            bufferedReader.close();
+            streamReader.close();
+            inputStream.close();
+
+            inputStream = getContentResolver().openInputStream(uri);
+            streamReader = new InputStreamReader(inputStream);
+            CSVParser parser = new CSVParserBuilder()
+                    .withSeparator(separator)
+                    .withIgnoreQuotations(false)
+                    .build();
+
+            CSVReader csvReader = new CSVReaderBuilder(streamReader)
+                    .withCSVParser(parser)
+                    .build();
+
+            // Re-read the first line to get column headers
+            String[] headers = csvReader.readNext();
+            if (headers != null) {
+                // Remove surrounding quotes and trim headers
+                for (int i = 0; i < headers.length; i++) {
+                    headers[i] = headers[i].replaceAll("^\"|\"$", "").trim();
+                }
+
+                // Assume headers are names of columns, adjust for your CSV format if needed
+                for (String header : headers) {
+                    // Check if the header is "id" or "index" and skip adding it to columns
+                    if (!header.equalsIgnoreCase("index") && !header.equalsIgnoreCase("id")) {
+                        Map<String, String> column = new HashMap<>();
+                        column.put("name", header);
+                        column.put("type", "TEXT"); // Assuming default type is TEXT
+                        columns.add(column);
+                    }
+                }
+            }
+
+            csvReader.close();
+            streamReader.close();
+            inputStream.close();
+
+        } catch (IOException | CsvValidationException e) {
+            e.printStackTrace();
+        }
+
+        return columns;
+    }
+
     private class CreateTableTask extends AsyncTask<Object, Void, String> {
         @Override
         protected String doInBackground(Object... params) {
@@ -472,6 +456,9 @@ public class MenuActivity extends AppCompatActivity implements TablesAdapter.OnT
             return result;
         }
 
+
+        //Interfaces executed after the data is downloaded from server
+
         @Override
         protected void onPostExecute(String result) {
             super.onPostExecute(result);
@@ -496,6 +483,7 @@ public class MenuActivity extends AppCompatActivity implements TablesAdapter.OnT
         tablesList.remove(position);
         tablesAdapter.notifyDataSetChanged();
     }
+    
     public void fetchDataFromServer()
     {
         new FetchDataTask(this).execute(config.API_GETDATA_URL);

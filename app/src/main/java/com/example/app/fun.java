@@ -310,5 +310,21 @@ public class fun {
         return jsonArray;
     }
 
+    // Function to detect the most likely separator in the first line
+    public static char detectSeparator(String line) {
+        char[] separators = {',', ';', '\t', '|'};
+        char bestSeparator = ',';
+        int maxCount = 0;
+
+        for (char separator : separators) {
+            int count = line.length() - line.replace(String.valueOf(separator), "").length();
+            if (count > maxCount) {
+                maxCount = count;
+                bestSeparator = separator;
+            }
+        }
+
+        return bestSeparator;
+    }
 
 }
