@@ -409,6 +409,7 @@ public class MenuActivity extends AppCompatActivity implements TablesAdapter.OnT
             String tableName = (String) params[0];
             ArrayList<Map<String, String>> columns = (ArrayList<Map<String, String>>) params[1];
             String result = "";
+
             try {
                 URL url = new URL(config.API_CREATETABLE_URL);
                 HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
@@ -419,14 +420,22 @@ public class MenuActivity extends AppCompatActivity implements TablesAdapter.OnT
                 StringBuilder columnDefinitions = new StringBuilder();
                 for (Map<String, String> column : columns) {
                     String columnName = column.get("name").replace(" ", "_"); // Replace spaces with underscores
-                    Log.d("ColumnName", "Original: " + column.get("name") + " | Replaced: " + columnName);
+
+                    // Add underscore if column name starts with a number
+                    if (columnName.matches("^\\d.*")) {
+                        columnName = "_" + columnName;
+                    }
+
+                    Log.d("ColumnName", "Original: " + column.get("name") + " | Modified: " + columnName);
                     columnDefinitions.append(columnName).append(" ").append(column.get("type")).append(",");
                 }
 
                 // Log column definitions before removing the last comma
                 Log.d("ColumnDefinitions", columnDefinitions.toString());
 
-                columnDefinitions.setLength(columnDefinitions.length() - 1); // Remove last comma
+                if (columnDefinitions.length() > 0) {
+                    columnDefinitions.setLength(columnDefinitions.length() - 1); // Remove last comma
+                }
 
                 String postData = "servername=" + URLEncoder.encode(config.ADDRESS, "UTF-8") +
                         "&username=" + URLEncoder.encode(config.DBUSER, "UTF-8") +
@@ -465,9 +474,7 @@ public class MenuActivity extends AppCompatActivity implements TablesAdapter.OnT
             return result;
         }
 
-
-        //Interfaces executed after the data is downloaded from server
-
+        // Interfaces executed after the data is downloaded from server
         @Override
         protected void onPostExecute(String result) {
             super.onPostExecute(result);
@@ -486,6 +493,7 @@ public class MenuActivity extends AppCompatActivity implements TablesAdapter.OnT
             }
         }
     }
+
 
     private void convertCSVFromUriToJson(Uri uri) {
         try (InputStream inputStream = getContentResolver().openInputStream(uri);
@@ -506,6 +514,7 @@ public class MenuActivity extends AppCompatActivity implements TablesAdapter.OnT
     }
 
     // Convert CSV data from BufferedReader to JSON string
+// Convert CSV data from BufferedReader to JSON string
     private String convertCSVToJson(BufferedReader reader) throws IOException {
         JSONArray jsonArray = new JSONArray();
         String firstLine = reader.readLine();
@@ -515,21 +524,16 @@ public class MenuActivity extends AppCompatActivity implements TablesAdapter.OnT
 
         // Detect separator
         char separator = fun.detectSeparator(firstLine);
+        String[] headers = firstLine.split(String.valueOf(separator));
 
+        // Initialize OpenCSV CSVReader
         try (CSVReader csvReader = new CSVReaderBuilder(reader)
-                .withSkipLines(1) // Skip the first line since it's already read
+                .withSkipLines(0) // Read all lines, including the header
                 .withCSVParser(new CSVParserBuilder().withSeparator(separator).build())
                 .build()) {
 
-            // Read headers
-            String[] headers = firstLine.split(String.valueOf(separator));
-            for (int i = 0; i < headers.length; i++) {
-                headers[i] = headers[i].replaceAll("^\"|\"$", "").trim().replace(" ", "_");
-            }
-
             String[] nextLine;
             while ((nextLine = csvReader.readNext()) != null) {
-                // Skip lines that don't match the number of headers
                 if (nextLine.length != headers.length) {
                     Log.d("CSVtoJSON", "Skipping malformed line: " + Arrays.toString(nextLine));
                     continue;
@@ -537,9 +541,23 @@ public class MenuActivity extends AppCompatActivity implements TablesAdapter.OnT
 
                 JSONObject jsonObject = new JSONObject();
                 for (int i = 0; i < headers.length; i++) {
-                    if (!headers[i].equalsIgnoreCase("id") && !headers[i].equalsIgnoreCase("index")) {
-                        String cleanValue = nextLine[i].replaceAll("^\"|\"$", "").trim();
-                        jsonObject.put(headers[i], cleanValue);
+                    // Clean and adjust header name
+                    String header = headers[i].replaceAll("^\"|\"$", "").trim();
+
+                    // Add underscore if header starts with a number
+                    if (header.matches("^\\d.*")) {
+                        header = "_" + header;
+                    }
+
+                    // Replace spaces with underscores
+                    header = header.replace(" ", "_");
+
+                    // Trim and assign value
+                    String value = nextLine[i].replaceAll("^\"|\"$", "").trim();
+
+                    // Exclude columns with names "id" and "index" from the JSON object
+                    if (!header.equalsIgnoreCase("id") && !header.equalsIgnoreCase("index")) {
+                        jsonObject.put(header, value);
                     }
                 }
                 jsonArray.put(jsonObject);
@@ -551,6 +569,8 @@ public class MenuActivity extends AppCompatActivity implements TablesAdapter.OnT
 
         return jsonArray.toString();
     }
+
+
 
 
     @Override
