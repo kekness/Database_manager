@@ -327,4 +327,11 @@ public class fun {
         return bestSeparator;
     }
 
+    public static void saveJsonToFile(String jsonString, File jsonFile) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(jsonFile))) {
+            writer.write(jsonString);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 }

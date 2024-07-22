@@ -33,11 +33,13 @@ import com.opencsv.CSVParserBuilder;
 import com.opencsv.CSVReader;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -47,6 +49,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import com.opencsv.CSVReader;
@@ -73,6 +76,7 @@ public class MenuActivity extends AppCompatActivity implements TablesAdapter.OnT
     static TablesAdapter tablesAdapter;
     static ArrayList<String> tablesList;
     public static File jsonFile;
+    public static File importFile;
     public String exportname;
 
     @SuppressLint("MissingInflatedId")
@@ -97,6 +101,7 @@ public class MenuActivity extends AppCompatActivity implements TablesAdapter.OnT
         infoTv.setText("Tables in "+config.DATABASE);
         //get actual data from saved file
         jsonFile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS), "data.json");
+        importFile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS), "import.json");
 
         if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
                 != PackageManager.PERMISSION_GRANTED) {
@@ -156,6 +161,7 @@ public class MenuActivity extends AppCompatActivity implements TablesAdapter.OnT
             Uri uri = data.getData();
             showImportTableDialog(uri);
             assert uri != null;
+            convertCSVFromUriToJson(uri);
             Log.d("nw czyddziala",uri.toString());
         }
     }
@@ -181,12 +187,15 @@ public class MenuActivity extends AppCompatActivity implements TablesAdapter.OnT
                     }
                     if (columns != null && !columns.isEmpty()) {
                         new CreateTableTask().execute(tableName, columns);
+                        config.TABLENAME=tableName;
+                        new SaveDataAsyncTask().execute(importFile);
                     } else {
                         Toast.makeText(MenuActivity.this, "Error parsing CSV file", Toast.LENGTH_SHORT).show();
                     }
                 } else {
                     Toast.makeText(MenuActivity.this, "Please enter table name", Toast.LENGTH_SHORT).show();
                 }
+
             }
         });
 
@@ -477,6 +486,72 @@ public class MenuActivity extends AppCompatActivity implements TablesAdapter.OnT
             }
         }
     }
+
+    private void convertCSVFromUriToJson(Uri uri) {
+        try (InputStream inputStream = getContentResolver().openInputStream(uri);
+             BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
+
+            // Convert CSV to JSON
+            String jsonString = convertCSVToJson(reader);
+
+            // Save JSON to file in the public Documents directory
+            File jsonFile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS), "import.json");
+            fun.saveJsonToFile(jsonString, jsonFile);
+
+            Log.d("CSVtoJSON", "JSON file saved at: " + jsonFile.getAbsolutePath());
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    // Convert CSV data from BufferedReader to JSON string
+    private String convertCSVToJson(BufferedReader reader) throws IOException {
+        JSONArray jsonArray = new JSONArray();
+        String firstLine = reader.readLine();
+        if (firstLine == null) {
+            return jsonArray.toString(); // Empty CSV
+        }
+
+        // Detect separator
+        char separator = fun.detectSeparator(firstLine);
+
+        try (CSVReader csvReader = new CSVReaderBuilder(reader)
+                .withSkipLines(1) // Skip the first line since it's already read
+                .withCSVParser(new CSVParserBuilder().withSeparator(separator).build())
+                .build()) {
+
+            // Read headers
+            String[] headers = firstLine.split(String.valueOf(separator));
+            for (int i = 0; i < headers.length; i++) {
+                headers[i] = headers[i].replaceAll("^\"|\"$", "").trim().replace(" ", "_");
+            }
+
+            String[] nextLine;
+            while ((nextLine = csvReader.readNext()) != null) {
+                // Skip lines that don't match the number of headers
+                if (nextLine.length != headers.length) {
+                    Log.d("CSVtoJSON", "Skipping malformed line: " + Arrays.toString(nextLine));
+                    continue;
+                }
+
+                JSONObject jsonObject = new JSONObject();
+                for (int i = 0; i < headers.length; i++) {
+                    if (!headers[i].equalsIgnoreCase("id") && !headers[i].equalsIgnoreCase("index")) {
+                        String cleanValue = nextLine[i].replaceAll("^\"|\"$", "").trim();
+                        jsonObject.put(headers[i], cleanValue);
+                    }
+                }
+                jsonArray.put(jsonObject);
+            }
+
+        } catch (CsvValidationException | JSONException e) {
+            e.printStackTrace();
+        }
+
+        return jsonArray.toString();
+    }
+
 
     @Override
     public void onTableDeleted(int position) {

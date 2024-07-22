@@ -3,7 +3,7 @@ package com.example.app;
 public class config {
     public static String ADDRESS = "192.168.171.89";
     public static String DATABASE="test";
-    public static String TABLENAME="nexttable";
+    public static String TABLENAME="uzytkownicy";
     public static String DBUSER="API";
     public static String DB_PASS=")Xcm*.H2OHn*THJl";
 
