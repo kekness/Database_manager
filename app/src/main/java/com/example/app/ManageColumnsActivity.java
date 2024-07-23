@@ -87,6 +87,49 @@ public class ManageColumnsActivity extends AppCompatActivity {
                 startActivity(new Intent(ManageColumnsActivity.this, MenuActivity.class));
             }
         });
+        tableNameEditText.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showEditTableNameDialog();
+            }
+        });
+
+    }
+    private void showEditTableNameDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Edit Table Name");
+
+        LinearLayout layout = new LinearLayout(this);
+        layout.setOrientation(LinearLayout.VERTICAL);
+
+        final EditText newTableNameEditText = new EditText(this);
+        newTableNameEditText.setHint("New Table Name");
+        layout.addView(newTableNameEditText);
+
+        builder.setView(layout);
+
+        builder.setPositiveButton("Save", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                String newTableName = newTableNameEditText.getText().toString().trim();
+                if (!newTableName.isEmpty()) {
+                    editTableName(newTableName);
+                    tableNameEditText.setText(newTableName+"'s columns");
+                } else {
+                    Toast.makeText(ManageColumnsActivity.this, "Please enter new table name", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+
+        AlertDialog dialog = builder.create();
+        dialog.show();
     }
 
     private void loadColumnsFromJsonFile(File jsonFile) {
@@ -192,6 +235,7 @@ public class ManageColumnsActivity extends AppCompatActivity {
                     editColumn(tableName, oldColumnName, newColumnName, newColumnType);
                     columnsList.set(pos,newColumnName);
                     columnsAdapter.notifyDataSetChanged();
+
                 } else {
                     Toast.makeText(ManageColumnsActivity.this, "Please enter new column name", Toast.LENGTH_SHORT).show();
                 }
@@ -382,6 +426,18 @@ public class ManageColumnsActivity extends AppCompatActivity {
         new ManageColumnsTask("edit_column").execute(params);
     }
 
+    private void editTableName(String newTableName) {
+        Map<String, String> params = new HashMap<>();
+        params.put("servername", config.ADDRESS);
+        params.put("username", config.DBUSER);
+        params.put("password", config.DB_PASS);
+        params.put("dbname", config.DATABASE);
+        params.put("action", "edit_tablename");
+        params.put("old_tablename", config.TABLENAME);
+        params.put("new_tablename", newTableName);
+
+        new ManageColumnsTask("edit_tablename").execute(params);
+    }
     private void deleteColumn(String tableName, String columnName) {
 
         Map<String, String> params = new HashMap<>();

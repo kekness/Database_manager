@@ -120,6 +120,7 @@ public class MainActivity extends AppCompatActivity implements FetchDataTask.Fet
             @Override
             public void onClick(View v) {
                 showAddDialog(MenuActivity.jsonFile);
+
             }
         });
 
@@ -163,6 +164,8 @@ public class MainActivity extends AppCompatActivity implements FetchDataTask.Fet
                 startActivity(new Intent(MainActivity.this, MenuActivity.class));
             }
         });
+
+
 
         // Set up the listener for sqlSpinner
         sqlSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -334,6 +337,7 @@ public class MainActivity extends AppCompatActivity implements FetchDataTask.Fet
                 fun.saveJsonArrayToFile(jsonArray, jsonFile);
 
                 dialog.dismiss();
+                updateTableLayout(jsonArray);
             } catch (Exception e) {
                 e.printStackTrace();
             }
