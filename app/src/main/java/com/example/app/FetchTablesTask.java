@@ -40,6 +40,7 @@ public class FetchTablesTask extends AsyncTask<Void, Void, String> {
                     "&password=" + URLEncoder.encode(config.DB_PASS, "UTF-8") +
                     "&dbname=" + URLEncoder.encode(config.DATABASE, "UTF-8");
 
+            //stream needed for sending data to the server
             OutputStream os = urlConnection.getOutputStream();
             BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"));
             writer.write(postData);
@@ -64,6 +65,8 @@ public class FetchTablesTask extends AsyncTask<Void, Void, String> {
         return result;
     }
 
+
+    //code that resolves after downloading tables from server
     @Override
     protected void onPostExecute(String result) {
         super.onPostExecute(result);

@@ -438,6 +438,7 @@ public class ManageColumnsActivity extends AppCompatActivity {
 
         new ManageColumnsTask("edit_tablename").execute(params);
     }
+
     private void deleteColumn(String tableName, String columnName) {
 
         Map<String, String> params = new HashMap<>();

@@ -40,14 +40,6 @@
             android:layout_width="100dp"
             android:layout_height="wrap_content"
             android:text="@string/export" />
-        <Button
-            android:id="@+id/admin_panel_button"
-            android:layout_width="130dp"
-            android:layout_height="wrap_content"
-            android:text="@string/admin_panel"
-            android:layout_marginEnd="8dp" />
-
-
     </LinearLayout>
 
     <LinearLayout

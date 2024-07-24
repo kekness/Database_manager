@@ -183,6 +183,7 @@ public class MainActivity extends AppCompatActivity implements FetchDataTask.Fet
         fetchDataFromServer(url);
     }
 
+    //gets data from array and displays it as a table
     public void updateTableLayout(JSONArray jsonArray) {
         tableLayout.removeAllViews();
 
@@ -288,6 +289,7 @@ public class MainActivity extends AppCompatActivity implements FetchDataTask.Fet
         sqlSpinner.setAdapter(spinnerAdapter);
     }
 
+    //dialog for adding a record to table
     private void showAddDialog(File jsonFile) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Add New Record");
@@ -353,6 +355,7 @@ public class MainActivity extends AppCompatActivity implements FetchDataTask.Fet
         builder.show();
     }
 
+    //dialog for editing record
     private void showEditDialog(JSONObject jsonObject, int position, JSONArray jsonArray) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Edit Record");

@@ -181,8 +181,8 @@ public class fun {
         return stringBuilder.toString();
     }
 
+    //exports data from config.tablename to a file
     public static void exportDataToCSV(String tableName,File jsonFile,String exportname) {
-        // Wczytaj dane z pliku JSON
         String jsonString = readJsonFromFile(jsonFile);
         if (jsonString == null || jsonString.isEmpty()) {
             Log.d("fjup zdziub", "No Data to export");
@@ -197,13 +197,13 @@ public class fun {
                 return;
             }
 
-            // Ścieżka do miejsca docelowego dla pliku CSV
+
             String csvFilePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS) + "/"+exportname+".csv";
 
-            // Tworzenie obiektu BufferedWriter do zapisu do pliku
+
             BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(csvFilePath), "UTF-8"));
 
-            // Dodanie nagłówków kolumn (klucze z pierwszego obiektu JSON)
+           //add headers
             JSONObject firstObject = jsonArray.getJSONObject(0);
             Iterator<String> keys = firstObject.keys();
             StringBuilder headerLine = new StringBuilder();
@@ -211,21 +211,21 @@ public class fun {
                 String key = keys.next();
                 headerLine.append("\"").append(key).append("\",");
             }
-            headerLine.deleteCharAt(headerLine.length() - 1); // Usunięcie ostatniego przecinka
+            headerLine.deleteCharAt(headerLine.length() - 1);
             bw.write(headerLine.toString());
             bw.newLine();
 
-            // Zapisywanie danych do pliku CSV
+            //save to csv
             for (int i = 0; i < jsonArray.length(); i++) {
                 JSONObject jsonObject = jsonArray.getJSONObject(i);
                 StringBuilder csvLine = new StringBuilder();
-                keys = firstObject.keys(); // Zresetuj iterator kluczy
+                keys = firstObject.keys();
                 while (keys.hasNext()) {
                     String key = keys.next();
                     String value = jsonObject.optString(key, "");
                     csvLine.append("\"").append(value).append("\",");
                 }
-                csvLine.deleteCharAt(csvLine.length() - 1); // Usunięcie ostatniego przecinka
+                csvLine.deleteCharAt(csvLine.length() - 1);
                 bw.write(csvLine.toString());
                 bw.newLine();
             }
@@ -239,7 +239,7 @@ public class fun {
         }
     }
 
-    // Metoda do odczytu danych z pliku JSON
+    //method used to read json from file
     private static String readJsonFromFile(File jsonFile) {
         StringBuilder jsonString = new StringBuilder();
         try (BufferedReader br = new BufferedReader(new FileReader(jsonFile))) {
@@ -254,11 +254,12 @@ public class fun {
         return jsonString.toString();
     }
 
+    //returns array list with data
     private static ArrayList<ArrayList<String>> getDataForTable(File jsonFile) {
         ArrayList<ArrayList<String>> data = new ArrayList<>();
 
         try {
-            // Otwórz strumień do odczytu z pliku jsonFile
+
             FileInputStream fis = new FileInputStream(jsonFile);
             BufferedReader reader = new BufferedReader(new InputStreamReader(fis));
 
@@ -268,13 +269,13 @@ public class fun {
                 jsonString.append(line);
             }
 
-            // Zamknij czytnik
+
             reader.close();
 
-            // Przetwórz JSON do listy danych
+
             JSONArray jsonArray = new JSONArray(jsonString.toString());
 
-            // Pobierz kolumny dla danych tabeli
+            //get colums for headers
             for (int i = 0; i < jsonArray.length(); i++) {
                 JSONObject rowObject = jsonArray.getJSONObject(i);
                 Iterator<String> keys = rowObject.keys();
@@ -295,6 +296,7 @@ public class fun {
         return data;
     }
 
+    //Converts csv string into json type
     public static JSONArray convertCSVToJson(String csvData) throws JSONException {
         JSONArray jsonArray = new JSONArray();
         String[] lines = csvData.split("\n");
@@ -329,6 +331,7 @@ public class fun {
         return bestSeparator;
     }
 
+    //saves json string into a given File
     public static void saveJsonToFile(String jsonString, File jsonFile) {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(jsonFile))) {
             writer.write(jsonString);

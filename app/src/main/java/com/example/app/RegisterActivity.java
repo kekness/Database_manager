@@ -23,6 +23,7 @@ import java.net.URL;
 
 public class RegisterActivity extends AppCompatActivity {
 
+    //declaration
     private EditText editTextName, editTextEmail, editTextPassword, editTextConfirmPassword;
     private Button buttonRegister;
     private TextView textViewLogin;
@@ -57,7 +58,7 @@ public class RegisterActivity extends AppCompatActivity {
                 String confirmPassword = editTextConfirmPassword.getText().toString();
 
                 if (validateInput(name, email, password, confirmPassword)) {
-                    // Jeśli dane są poprawne, wykonujemy zadanie rejestracji
+                    // if data is correct, register function executes
                     new RegisterTask().execute(name, email, password);
                 }
             }

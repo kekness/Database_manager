@@ -95,6 +95,7 @@ public class LoginActivity extends AppCompatActivity {
             }
         }
 
+        //after connecting the database
         @Override
         protected void onPostExecute(String result) {
 
@@ -117,11 +118,9 @@ public class LoginActivity extends AppCompatActivity {
 
                 } catch (JSONException e) {
                     e.printStackTrace();
-                    // Błąd parsowania odpowiedzi serwera
                     Toast.makeText(LoginActivity.this, "Error parsing server response", Toast.LENGTH_SHORT).show();
                 }
             } else {
-                // Błąd połączenia z serwerem
                 Toast.makeText(LoginActivity.this, "Error connecting to server", Toast.LENGTH_SHORT).show();
             }
         }
